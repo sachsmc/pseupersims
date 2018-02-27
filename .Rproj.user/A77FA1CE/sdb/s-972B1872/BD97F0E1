@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "\n#' Run one replicate of the experiment\n#'\n#' Generates data, analyzes the results in different ways, runs the perturbation algorithm,\n#' and returns the output in a sensible manner.\n#'\n#' @param seed random seed (integer)\n#' @param output path to output file\n#'\n#' @export\n\nrun_one_replicate <- function(seed = floor(runif(1 * 1000)), output = \"repouput.rds\") {\n\n  indat <- generate_data()\n\n  indat2 <- add_pseudo_obs(indat, time = 26.5)\n\n  slearn.fit <- superlearner_estimate(indat2)\n  cox.fit <- pcox_estimate(indat2)\n\n  pturb.est <- local_slope(slearn.fit)\n\n\n\n}",
+    "created" : 1519723628090.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "410888334",
+    "id" : "BD97F0E1",
+    "lastKnownWriteTime" : 1519724121,
+    "last_content_update" : 1519724329166,
+    "path" : "G:/STAFF/Michael Sachs/Stats Projects/IRIS prediction/Code/pseupersims/R/replicate.R",
+    "project_path" : "R/replicate.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

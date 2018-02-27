@@ -1,0 +1,20 @@
+Package: pseupersims
+Type: Package
+Title: Simulation Study for Predicting Pseudo-observations in Survival Analysis with Superlearner
+Version: 0.1.0
+Author: Michael C Sachs, Andrea Discacciati, Erin E Gabriel
+Maintainer: Michael C Sachs <sachsmc@gmail.com>
+Description: Code to run a simulation study and evaluate the results for a statistical method
+    using superlearner run on pseudo-observations to predict the cumulative incidence of a 
+    survival outcome with competing risks. The model is then evaluated using the time dependent
+    ROC curve which is also estimated using pseudo-observations. The method and results will 
+    appear in a forthcoming paper. 
+License: GPL
+Encoding: UTF-8
+LazyData: true
+Depends:
+  survival,
+  SuperLearner,
+  pseudo,
+  testthat
+RoxygenNote: 6.0.1

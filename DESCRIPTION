@@ -18,3 +18,4 @@ Depends:
   pseudo,
   testthat
 RoxygenNote: 6.0.1
+Suggests: testthat

@@ -12,6 +12,7 @@
 
 generate_data <- function(n = 500) {
 
+  ## TODO generate multiple x values
   X <- rnorm(n, mean = 1, sd = .1)
 
   g2 <- exp(.25 + .1 * X + rnorm(n, sd = .1))
@@ -22,6 +23,8 @@ generate_data <- function(n = 500) {
   rescl <- mean(26.5 / ((-log(.8)) ^ (1/g2)))
 
   g1 <- g1 * rescl / mean(g1)
+
+  ## TODO generate competing risk
 
   Y <- rweibull(n, scale = g1, shape = g2)
 

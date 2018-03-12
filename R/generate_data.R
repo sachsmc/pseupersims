@@ -33,6 +33,18 @@ generate_data <- function(n = 500, scenario = "A") {
     g2 <- exp(.25 + .1 * X[, 1] + rnorm(n, sd = .1))
     g1 <- exp(2 * X[, 1] + rnorm(n, sd = .01))
 
+  } else if(scenario == "B") {
+
+    beta.b <- c(.01, .01, -.01, -.02, .03)
+
+    g2 <- exp(.25 + X[, c(1, 6, 11, 16, 20)] %*% beta.b + rnorm(n, sd = .1))
+    g1 <- exp(2 * X[, c(1, 6, 11, 16, 20)] %*% beta.b + rnorm(n, sd = .01))
+
+
+  } else if(scenario == "C") {
+
+
+
   }
 
   k2 <- exp(.05 + .025 * X[, 1] + rnorm(n, sd = .1))

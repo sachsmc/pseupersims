@@ -4,7 +4,15 @@
 \alias{generate_data}
 \title{Generate survival data for analysis}
 \usage{
-generate_data()
+generate_data(n = 500, scenario = "A")
+}
+\arguments{
+\item{n}{Sample size}
+
+\item{scenario}{Character designating the simulation scenario: 0 = NULL, no association, A = simple, one variable
+is linearly associated with IRIS,
+B = simple multivariate, 5 variables are linearly associated,
+C = wonky, interactions, nonlinearities, etc.}
 }
 \value{
 A data frame with X variables, censored survival times (competing risk w death), and true cumulative incidence at 26.5 weeks

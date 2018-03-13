@@ -43,6 +43,16 @@ generate_data <- function(n = 500, scenario = "A") {
 
   } else if(scenario == "C") {
 
+    X2 <- X[, c(1, 6, 11, 16, 20)]
+    X2 <- cbind(X2, X2[, 1] * X2[, 2],
+                cos(X2[, 3] / .1),
+                ifelse(X2[, 4] < median(X2[, 4]), 0, 1))
+
+
+    beta.c <- c(.1, .4, -.1, -.2, .3, .5, .7, .5)
+
+    g1 <- exp(2 + X2 %*% beta.c + rnorm(n, sd = 0.01))
+    g2 <- exp(-1.25 + rnorm(n, sd = .1))
 
 
   }

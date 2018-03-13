@@ -12,6 +12,10 @@ testthat("Generated data has approximately 20% cumulative incidence at 26.5 week
   ckdat <- generate_data(n = 15000, "B")
   expect_equal(mean(ckdat$trueP), .2, tolerance = .05)
 
+  ckdat <- generate_data(n = 15000, "C")
+  expect_equal(mean(ckdat$trueP), .2, tolerance = .05)
+
+
   ckdat <- generate_data(n = 2000, "0")
   psuo <- pseudoci(ckdat$Tout, event = ckdat$delta, tmax = 26.5)
   expect_equal(mean(psuo$pseudo$cause1[, 1]), .2, tolerance = .05)

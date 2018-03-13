@@ -25,20 +25,17 @@ generate_data <- function(n = 500, scenario = "A") {
 
   if(scenario == "0") {
 
-    g2 <- exp(.25 + rnorm(n, sd = .1))
     g1 <- exp(rnorm(n, sd = .01))
 
   } else if(scenario == "A") {
 
-    g2 <- exp(.25 + .1 * X[, 1] + rnorm(n, sd = .1))
-    g1 <- exp(2 * X[, 1] + rnorm(n, sd = .01))
+    g1 <- exp(8 * X[, 1] + rnorm(n, sd = .01))
 
   } else if(scenario == "B") {
 
-    beta.b <- c(.01, .01, -.01, -.02, .03)
+    beta.b <- c(1.1, 1.1, 1.01, -3.02, 2.03) / 5
 
-    g2 <- exp(.25 + X[, c(1, 6, 11, 16, 20)] %*% beta.b + rnorm(n, sd = .1))
-    g1 <- exp(2 * X[, c(1, 6, 11, 16, 20)] %*% beta.b + rnorm(n, sd = .01))
+    g1 <- exp(X[, c(1, 6, 11, 16, 20)] %*% beta.b + rnorm(n, sd = .15))
 
 
   } else if(scenario == "C") {
@@ -46,28 +43,27 @@ generate_data <- function(n = 500, scenario = "A") {
     X2 <- X[, c(1, 6, 11, 16, 20)]
     X2 <- cbind(X2, X2[, 1] * X2[, 2],
                 cos(X2[, 3] / .1),
-                ifelse(X2[, 4] < median(X2[, 4]), 0, 1))
+                X2[, 4] * ifelse(X2[, 4] < median(X2[, 4]), 0, 1))
 
 
-    beta.c <- c(.1, .4, -.1, -.2, .3, .5, .7, .5)
+    beta.c <- c(2.1, 2.4, -1.1, -1.2, -.3, 1.5, .7, 1.5) / 5
 
-    g1 <- exp(2 + X2 %*% beta.c + rnorm(n, sd = 0.01))
-    g2 <- exp(-1.25 + rnorm(n, sd = .1))
-
+    g1 <- exp(X2 %*% beta.c + rnorm(n, sd = 0.1))
 
   }
 
-  k2 <- exp(.05 + .025 * X[, 1] + rnorm(n, sd = .1))
+  k2 <- 2.5
+  g2 <- 1.5
   k1 <- exp(.5 * X[, 1] + rnorm(n, sd = .01))
 
   # ensure that g1 satisfies pweibull(26.5) ~= .20
   # ensure that k1 satisfies pweibull(26.5) ~= .07
 
-  rescl <- mean(26.5 / ((-log(.8)) ^ (1/g2)))
-  reskl <- mean(26.5 / ((-log(1 - .07)) ^ (1 / k2)))
+  rescl <- (26.5 / ((-log(.8)) ^ (1/g2)))
+  reskl <- (26.5 / ((-log(1 - .07)) ^ (1 / k2)))
 
-  g1 <- g1 * rescl / mean(g1)
-  k1 <- k1 * reskl / mean(k1)
+  g1 <- g1 * (rescl / median(g1))
+  k1 <- k1 * (reskl / median(k1))
 
   Y <- rweibull(n, scale = g1, shape = g2)
   Y2 <- rweibull(n, scale = k1, shape = k2)
@@ -99,6 +95,11 @@ generate_data <- function(n = 500, scenario = "A") {
 
 add_pseudo_obs <- function(data) {
 
+  psuo <- pseudoci(data$Tout, event = data$delta, tmax = 26.5)
 
+  data$cause1.pseudo <- psuo$pseudo$cause1[, 1]  # this is the one we're analyzing
+  data$cause2.pseudo <- psuo$pseudo$cause2[, 1]
+
+  data
 
 }

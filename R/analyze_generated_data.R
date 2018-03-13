@@ -9,8 +9,20 @@
 
 
 
-superlearner_estimate <- function(formula, data) {
+superlearner_estimate <- function(data, Y = "cause1.pseudo", X = paste0("X", 1:20)) {
 
+  XX <- as.data.frame(lapply(data[, X], standardize))
+  YY <- data[[Y]]
+
+
+  SL.library <-  list("SL.glm", "SL.randomForest", "SL.gam",  "SL.ksvm", "SL.cforest",
+                      "SL.rpart", "SL.xgboost", "SL.glmnet","SL.polymars")
+
+  sl.full <- SuperLearner(Y = YY, X = XX, SL.library = SL.library,
+                          verbose = FALSE, method = "method.pseudoAUC")
+
+
+  sl.full
 
 }
 
@@ -25,11 +37,7 @@ superlearner_estimate <- function(formula, data) {
 
 
 
-pcox_estimate <- function(formula, data) {
+pcox_estimate <- function(data, Y = "cause1.pseudo", X = paste0("X", 1:20)) {
 
 
 }
-
-
-
-

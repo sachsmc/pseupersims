@@ -4,12 +4,12 @@
 \alias{superlearner_estimate}
 \title{Run the superlearner model with pseudo observations as the outcome}
 \usage{
-superlearner_estimate(formula, data)
+superlearner_estimate(data, Y = "cause1.pseudo", X = paste0("X", 1:20))
 }
 \arguments{
-\item{formula}{A formula describing the model}
-
 \item{data}{A data frame with pseudo observations and a set of predictors}
+
+\item{formula}{A formula describing the model}
 }
 \value{
 A fitted model object

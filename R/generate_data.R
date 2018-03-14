@@ -17,25 +17,25 @@
 generate_data <- function(n = 500, scenario = "A") {
 
   X5 <- matrix(rnorm(n * 5, mean = 1, sd = .1), ncol = 5)
-  X52 <- X5 %*% matrix(.25, nrow = 5, ncol = 5) + matrix(rnorm(n * 5, mean = 1, sd = .1), ncol = 5)
-  X53 <- X52 %*% matrix(.1, nrow = 5, ncol = 5) + matrix(rnorm(n * 5, mean = 1, sd = .5), ncol = 5)
+  X52 <- X5 %*% matrix(0, nrow = 5, ncol = 5) + matrix(rnorm(n * 5, mean = 1, sd = .1), ncol = 5)
+  X53 <- X52 %*% matrix(0, nrow = 5, ncol = 5) + matrix(rnorm(n * 5, mean = 1, sd = .5), ncol = 5)
   X54 <- X53 %*% matrix(.05, nrow = 5, ncol = 5) + matrix(rnorm(n * 5, mean = 1, sd = .65), ncol = 5)
 
   X <- cbind(X5, X52, X53, X54)
 
   if(scenario == "0") {
 
-    g1 <- exp(rnorm(n, sd = .01))
+    g1 <- exp(1)
 
   } else if(scenario == "A") {
 
-    g1 <- exp(8 * X[, 1] + rnorm(n, sd = .01))
+    g1 <- exp(2 * X[, 1])
 
   } else if(scenario == "B") {
 
-    beta.b <- c(1.1, 1.1, 1.01, -3.02, 2.03) / 5
+    beta.b <- c(1.1, 1.1, 1.01, -3.02, 2.03) / 3
 
-    g1 <- exp(X[, c(1, 6, 11, 16, 20)] %*% beta.b + rnorm(n, sd = .15))
+    g1 <- exp(X[, c(1, 6, 11, 16, 20)] %*% beta.b)
 
 
   } else if(scenario == "C") {
@@ -46,15 +46,15 @@ generate_data <- function(n = 500, scenario = "A") {
                 X2[, 4] * ifelse(X2[, 4] < median(X2[, 4]), 0, 1))
 
 
-    beta.c <- c(2.1, 2.4, -1.1, -1.2, -.3, 1.5, .7, 1.5) / 5
+    beta.c <- c(2.1, 2.4, -4.1, -1.2, -4.3, 1.5, 6.7, 1.5) / 3
 
-    g1 <- exp(X2 %*% beta.c + rnorm(n, sd = 0.1))
+    g1 <- exp(X2 %*% beta.c)
 
   }
 
   k2 <- 2.5
-  g2 <- 1.5
-  k1 <- exp(.5 * X[, 1] + rnorm(n, sd = .01))
+  g2 <- 3.5
+  k1 <- exp(.5 * X[, 1])
 
   # ensure that g1 satisfies pweibull(26.5) ~= .20
   # ensure that k1 satisfies pweibull(26.5) ~= .07
@@ -62,13 +62,13 @@ generate_data <- function(n = 500, scenario = "A") {
   rescl <- (26.5 / ((-log(.8)) ^ (1/g2)))
   reskl <- (26.5 / ((-log(1 - .07)) ^ (1 / k2)))
 
-  g1 <- g1 * (rescl / median(g1))
-  k1 <- k1 * (reskl / median(k1))
+  g1 <- g1 * mean(rescl / (g1))
+  k1 <- k1 * mean(reskl / (k1))
 
   Y <- rweibull(n, scale = g1, shape = g2)
   Y2 <- rweibull(n, scale = k1, shape = k2)
 
-  Cen <- pmin(runif(n, 0, 50), 50)
+  Cen <- runif(n, quantile(c(Y, Y2), .5), max(c(Y, Y2)))
 
   Tout <- pmin(Y, Y2, Cen)
   delta <- ifelse(Cen < Y & Cen < Y2, 0,
@@ -88,14 +88,15 @@ generate_data <- function(n = 500, scenario = "A") {
 #' Allow arbitrary names
 #'
 #' @param data A data frame with censored survival times for 2 outcomes
+#' @param weights Vector of probability weights
 #' @return The data frame with pseudo observations added for t = 26.5 weeks
 #'
 #'
 #' @export
 
-add_pseudo_obs <- function(data) {
+add_pseudo_obs <- function(data, weights = rep(1, nrow(data))) {
 
-  psuo <- pseudoci(data$Tout, event = data$delta, tmax = 26.5)
+  psuo <- pseudoci.weighted(data$Tout, event = data$delta, tmax = 26.5, weights = weights)
 
   data$cause1.pseudo <- psuo$pseudo$cause1[, 1]  # this is the one we're analyzing
   data$cause2.pseudo <- psuo$pseudo$cause2[, 1]

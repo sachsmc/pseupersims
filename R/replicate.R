@@ -11,17 +11,19 @@
 
 run_one_replicate <- function(seed = floor(runif(1 * 1000)), output = "repouput.rds") {
 
-  indat <- generate_data(n = 2000, scenario = "A")
+  indat <- generate_data(n = 500, scenario = "A")
   validat <- add_pseudo_obs(generate_data(scenario = "A"))
 
   indat2 <- add_pseudo_obs(indat)
 
   slearn.fit <- superlearner_estimate(indat2, Y = "cause1.pseudo", X = paste0("X", 1:20))
 
+
   plot(validat$trueP ~ predict(slearn.fit, validat[, paste0("X", 1:20)])$pred[, 1])
+  plot(indat$trueP ~ predict(slearn.fit)$pred[, 1])
 
 
-  pturb.est <- local_slope(slearn.fit)
+  indat2$binY <- with(indat2, ifelse(Tout > 26.5, 0, ifelse(delta == 1, 1, NA)))
 
 
 

@@ -4,12 +4,12 @@
 \alias{pcox_estimate}
 \title{Run the a penalized cox regression model}
 \usage{
-pcox_estimate(formula, data)
+pcox_estimate(data, Y = "cause1.pseudo", X = paste0("X", 1:20))
 }
 \arguments{
-\item{formula}{A formula describing the model}
-
 \item{data}{A data frame with a survival outcome and a set of predictors}
+
+\item{formula}{A formula describing the model}
 }
 \value{
 A fitted model object

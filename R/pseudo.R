@@ -1,5 +1,3 @@
-#' @import survival
-
 #' Pseudo observations for the weighted cumulative incidence function
 #'
 #' Computes pseudo-observations for modeling competing risks based on the possibly weighted cumulative incidence function
@@ -16,6 +14,7 @@
 #'   \item{pseudo}{A list of matrices - a matrix for each of the causes, ordered by codes. Each row of a matrix belongs to one individual (ordered as in the original data set), each column presents a time point (ordered in time).}
 #' }
 #' @export
+#' @import survival
 
 pseudoci.weighted <- function (time, event, tmax, weights = rep(1, length(time)))
 {
@@ -106,6 +105,7 @@ ci.omit.weighted <- function (pseudo, tmax, causes, weights) {
     }
   })
 
+  ncauses <- length(causes)
   CI <- list(rep(NA, ncauses))
   for(j in 1:ncauses) {
 

@@ -59,6 +59,7 @@ optimize_auc <-
     }
 
     trag <- optim(rep(0.01, ncol(Z)), tomax, method = "BFGS")
+
     if (trag$convergence == 0) {
       trag$par / sum(trag$par)
 
@@ -92,7 +93,8 @@ method.pseudoAUC <- function() {
         1 - (calc_auc(rocin$fpf, rocin$tpf))
       })
 
-      coef <- optimize_auc(Z, Y)
+      coef <- tryCatch(optimize_auc(Z, Y), error = function(e) rep(NA, ncol(Z)),
+                       warning = function(e) rep(NA, ncol(Z)))
       out <- list(cvRisk = cvRisk,
                   coef = coef,
                   optimizer = NULL)

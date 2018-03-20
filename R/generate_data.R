@@ -25,15 +25,15 @@ generate_data <- function(n = 500, scenario = "A") {
 
   if(scenario == "0") {
 
-    g1 <- exp(1)
+    g1 <- exp(rnorm(n, mean = 0, sd = .1))
 
   } else if(scenario == "A") {
 
-    g1 <- exp(2 * X[, 1])
+    g1 <- exp(-2 + 2 * X[, 1])
 
   } else if(scenario == "B") {
 
-    beta.b <- c(1.1, 1.1, 1.01, -3.02, 2.03) / 3
+    beta.b <- c(1.1, 1.1, 2.01, -3.02, -2.03) / 3
 
     g1 <- exp(X[, c(1, 6, 11, 16, 20)] %*% beta.b)
 
@@ -46,7 +46,7 @@ generate_data <- function(n = 500, scenario = "A") {
                 X2[, 4] * ifelse(X2[, 4] < median(X2[, 4]), 0, 1))
 
 
-    beta.c <- c(2.1, 2.4, -4.1, -1.2, -4.3, 1.5, 6.7, 1.5) / 3
+    beta.c <- c(2.1, 2.4, -4.1, -1.2, -4.3, -1.5, 6.7, 1.5) / 3
 
     g1 <- exp(X2 %*% beta.c)
 
@@ -68,11 +68,19 @@ generate_data <- function(n = 500, scenario = "A") {
   Y <- rweibull(n, scale = g1, shape = g2)
   Y2 <- rweibull(n, scale = k1, shape = k2)
 
-  Cen <- runif(n, quantile(c(Y, Y2), .5), max(c(Y, Y2)))
+  Cen <- runif(n, quantile(c(Y, Y2), .05), max(c(Y, Y2)))
 
   Tout <- pmin(Y, Y2, Cen)
   delta <- ifelse(Cen < Y & Cen < Y2, 0,
                   ifelse(Y < Y2, 1, 2))
+
+  ## addtional random censoring
+  makeup <- .1 - mean(delta == 0)
+  if(makeup > .01) {
+    randcens <- sample(which(delta != 0), size = floor(sum(delta != 0) * makeup))
+    delta[randcens] <- 0
+    Tout[randcens] <- Tout[randcens] * .95
+  }
 
   trueP <- pweibull(26.5, scale = g1, shape = g2)
 
@@ -94,9 +102,9 @@ generate_data <- function(n = 500, scenario = "A") {
 #'
 #' @export
 
-add_pseudo_obs <- function(data, weights = rep(1, nrow(data))) {
+add_pseudo_obs <- function(data) {
 
-  psuo <- pseudoci.weighted(data$Tout, event = data$delta, tmax = 26.5, weights = weights)
+  psuo <- pseudoci(data$Tout, event = data$delta, tmax = 26.5)
 
   data$cause1.pseudo <- psuo$pseudo$cause1[, 1]  # this is the one we're analyzing
   data$cause2.pseudo <- psuo$pseudo$cause2[, 1]

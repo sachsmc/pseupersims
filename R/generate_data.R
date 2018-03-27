@@ -8,13 +8,14 @@
 #'                 is linearly associated with IRIS,
 #'                 B = simple multivariate, 5 variables are linearly associated,
 #'                 C = wonky, interactions, nonlinearities, etc.
+#' @param missing.p Proportion of missing binary Y values (random censoring)
 #'
 #' @return A data frame with X variables, censored survival times (competing risk w death), and true cumulative incidence at 26.5 weeks
 #'
 #' @export
 
 
-generate_data <- function(n = 500, scenario = "A") {
+generate_data <- function(n = 500, scenario = "A", missing.p = .1) {
 
   X5 <- matrix(rnorm(n * 5, mean = 0, sd = .1), ncol = 5)
   X52 <- X5 %*% matrix(0, nrow = 5, ncol = 5) + matrix(rnorm(n * 5, mean = 0, sd = .1), ncol = 5)
@@ -75,11 +76,11 @@ generate_data <- function(n = 500, scenario = "A") {
                   ifelse(Y < Y2, 1, 2))
 
   ## addtional random censoring
-  makeup <- .1 - mean(delta == 0)
+  makeup <- missing.p - mean(delta == 0)
   if(makeup > .01) {
     randcens <- sample(which(delta != 0), size = floor(sum(delta != 0) * makeup))
     delta[randcens] <- 0
-    Tout[randcens] <- Tout[randcens] * .95
+    Tout[randcens] <- runif(length(randcens), 0, 26.5)
   }
 
   trueP <- pweibull(26.5, scale = g1, shape = g2)

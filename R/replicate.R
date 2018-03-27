@@ -6,16 +6,17 @@
 #'
 #' @param seed random seed (integer)
 #' @param scenario data generation scenario, 0, A, B, or C
+#' @param missing.p proportion missing the binary outcome
 #' @param output path to output file
 #'
 #' @export
 
-run_one_replicate <- function(seed, scenario = "A", output = "repouput.rds") {
+run_one_replicate <- function(seed, scenario = "A", missing.p = .1,  output = "repouput.rds") {
 
   if(!missing(seed)) set.seed(seed)
 
-  indat <- generate_data(n = 500, scenario = scenario)
-  validat <- add_pseudo_obs(generate_data(scenario = scenario))
+  indat <- generate_data(n = 500, scenario = scenario, missing.p = missing.p)
+  validat <- add_pseudo_obs(generate_data(scenario = scenario, missing.p = missing.p))
 
   indat2 <- add_pseudo_obs(indat)
 

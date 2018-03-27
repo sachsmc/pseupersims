@@ -11,7 +11,7 @@ testthat("Generated data has approximately 20% cumulative incidence at 26.5 week
   expect_equal(mean(ckdat$trueP), .2, tolerance = .05)
 
   ckdat <- generate_data(n = 15000, "B")
-  expect_equal(mean(ckdat$trueP), .2, tolerance = .05)
+  expect_equal(mean(ckdat$trueP), .2, tolerance = .075)
 
   ckdat <- generate_data(n = 15000, "C")
   expect_equal(mean(ckdat$trueP), .2, tolerance = .1)

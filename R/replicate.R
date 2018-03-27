@@ -31,16 +31,16 @@ run_one_replicate <- function(seed, scenario = "A", output = "repouput.rds") {
 
   ## back transform
 
-  predres <- (exp(predres) * 2 - 1) / (exp(predres) + 1)
-
-  mse.pseudo <- mean((validat$trueP - predres)^2)
+  validat$predres.pseudo <- (exp(predres) * 2 - 1) / (exp(predres) + 1)
 
   indat2$binY <- with(indat2, ifelse(Tout > 26.5, 0, ifelse(delta == 1, 1, NA)))
   slearn.binfit <- superlearner_binaryestimate(subset(indat2, !is.na(binY)), Y = "binY", X = paste0("X", 1:20))
 
-  mse.binary <- mean((validat$trueP - predict(slearn.binfit, validat[, paste0("X", 1:20)])$pred[, 1])^2)
+  bin.predres <-  predict(slearn.binfit, validat[, paste0("X", 1:20)])$pred[, 1]
 
-  c(mse.pseudo = mse.pseudo, mse.binary = mse.binary)
+  validat$predres.binary <- bin.predres
+
+  saveRDS(validat, file = output)
 
 
 }

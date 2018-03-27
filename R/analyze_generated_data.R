@@ -11,7 +11,7 @@
 
 superlearner_estimate <- function(data, Y = "cause1.pseudo", X = paste0("X", 1:20)) {
 
-  XX <- as.data.frame(lapply(data[, X], standardize))
+  XX <- data[, X]
   YY <- log((data[[Y]] + 1) / (2 - data[[Y]]))
 
   tune = list(ntrees = c(100, 200),
@@ -30,7 +30,7 @@ superlearner_estimate <- function(data, Y = "cause1.pseudo", X = paste0("X", 1:2
                       "SL.rpart", "SL.glmnet" , c("SL.polymars", "screen.corP")), learners$names)
 
   sl.full <- SuperLearner(Y = YY, X = XX, SL.library = SL.library,
-                          verbose = FALSE, method = "method.pseudoAUC")
+                          verbose = FALSE, method = "method.NNLS")
 
 
   sl.full
@@ -40,7 +40,7 @@ superlearner_estimate <- function(data, Y = "cause1.pseudo", X = paste0("X", 1:2
 
 superlearner_binaryestimate <- function(data, Y = "binY", X = paste0("X", 1:20)) {
 
-  XX <- as.data.frame(lapply(data[, X], standardize))
+  XX <- data[, X]
   YY <- data[[Y]]
 
   tune = list(ntrees = c(100, 200),
@@ -60,7 +60,7 @@ superlearner_binaryestimate <- function(data, Y = "binY", X = paste0("X", 1:20))
 
 
   sl.full <- SuperLearner(Y = YY, X = XX, SL.library = SL.library, family = binomial(),
-                          verbose = FALSE, method = "method.AUC")
+                          verbose = FALSE, method = "method.NNloglik")
 
 
   sl.full

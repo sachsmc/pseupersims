@@ -16,26 +16,26 @@
 
 generate_data <- function(n = 500, scenario = "A") {
 
-  X5 <- matrix(rnorm(n * 5, mean = 1, sd = .1), ncol = 5)
-  X52 <- X5 %*% matrix(0, nrow = 5, ncol = 5) + matrix(rnorm(n * 5, mean = 1, sd = .1), ncol = 5)
-  X53 <- X52 %*% matrix(0, nrow = 5, ncol = 5) + matrix(rnorm(n * 5, mean = 1, sd = .5), ncol = 5)
-  X54 <- X53 %*% matrix(.05, nrow = 5, ncol = 5) + matrix(rnorm(n * 5, mean = 1, sd = .65), ncol = 5)
+  X5 <- matrix(rnorm(n * 5, mean = 0, sd = .1), ncol = 5)
+  X52 <- X5 %*% matrix(0, nrow = 5, ncol = 5) + matrix(rnorm(n * 5, mean = 0, sd = .1), ncol = 5)
+  X53 <- X52 %*% matrix(0, nrow = 5, ncol = 5) + matrix(rnorm(n * 5, mean = 0, sd = .5), ncol = 5)
+  X54 <- X53 %*% matrix(.05, nrow = 5, ncol = 5) + matrix(rnorm(n * 5, mean = 0, sd = .65), ncol = 5)
 
   X <- cbind(X5, X52, X53, X54)
 
   if(scenario == "0") {
 
-    g1 <- exp(rnorm(n, mean = 0, sd = .1))
+    g1 <- exp(rnorm(n, mean = 0, sd = .35))
 
   } else if(scenario == "A") {
 
-    g1 <- exp(-2 + 2 * X[, 1])
+    g1 <- exp(-2 + 15 * X[, 1])
 
   } else if(scenario == "B") {
 
-    beta.b <- c(1.1, 1.1, 2.01, -3.02, -2.03) / 3
+    beta.b <- c(1.75, 1.5, 2.01, -3.02, -2.03) / 3
 
-    g1 <- exp(X[, c(1, 6, 11, 16, 20)] %*% beta.b)
+    g1 <- sqrt(exp( X[, c(1, 6, 11, 16, 20)] %*% beta.b))
 
 
   } else if(scenario == "C") {
@@ -46,9 +46,9 @@ generate_data <- function(n = 500, scenario = "A") {
                 X2[, 4] * ifelse(X2[, 4] < median(X2[, 4]), 0, 1))
 
 
-    beta.c <- c(2.1, 2.4, -4.1, -1.2, -4.3, -1.5, 6.7, 1.5) / 3
+    beta.c <- c(2.1, 2.4, -4.1, -1.2, -4.3, -1.5, 6.7, 1.5) / 4
 
-    g1 <- exp(X2 %*% beta.c)
+    g1 <- sqrt(exp(X2 %*% beta.c))
 
   }
 
@@ -83,6 +83,8 @@ generate_data <- function(n = 500, scenario = "A") {
   }
 
   trueP <- pweibull(26.5, scale = g1, shape = g2)
+
+  X <- apply(X, MAR = 2, standardize)
 
   data.frame(Tout, delta, X, trueT = Y < 26.5,
              trueP, Cen, Y, Y2)

@@ -16,6 +16,7 @@ Depends:
   survival,
   SuperLearner,
   pseudo,
+  ROCR,
   testthat
 RoxygenNote: 6.0.1
 Suggests: testthat

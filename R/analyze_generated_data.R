@@ -9,10 +9,10 @@
 
 
 
-superlearner_estimate <- function(data, Y = "cause1.pseudo", X = paste0("X", 1:20)) {
+superlearner_estimate <- function(data, Y = "cause1.pseudo", X = paste0("X", 1:20), y0, y1) {
 
   XX <- data[, X]
-  YY <- log((data[[Y]] + 1) / (2 - data[[Y]]))
+  YY <- data[[Y]] #log((data[[Y]] - y0) / (y1 - data[[Y]]))
 
   tune = list(ntrees = c(100, 200),
               max_depth = 1:3,
@@ -68,18 +68,34 @@ superlearner_binaryestimate <- function(data, Y = "binY", X = paste0("X", 1:20))
 }
 
 
-#' Run the a penalized cox regression model
-#'
-#' @param formula A formula describing the model
-#' @param data A data frame with a survival outcome and a set of predictors
-#'
-#' @return A fitted model object
-#'
-#' @export
 
 
+stupidlearner_estimate <- function(data, Y = "cause1.pseudo", X = paste0("X", 1:20), y0, y1) {
 
-pcox_estimate <- function(data, Y = "cause1.pseudo", X = paste0("X", 1:20)) {
+  XX <- data[, X]
+  YY <- data[[Y]] #log((data[[Y]] - y0) / (y1 - data[[Y]]))
 
+  tmpd <- data.frame(Y = YY, XX)
+  fit0 <- lm(Y ~ ., data = tmpd)
+
+  fit1 <- step(fit0, trace = 0)
+  fit1
 
 }
+
+
+stupidlearner_binaryestimate <- function(data, Y = "binY", X = paste0("X", 1:20), y0, y1) {
+
+  XX <- data[, X]
+  YY <- data[[Y]] #log((data[[Y]] - y0) / (y1 - data[[Y]]))
+
+  tmpd <- data.frame(Y = YY, XX)
+  fit0 <- glm(Y ~ ., data = tmpd, family = "binomial")
+
+  fit1 <- step(fit0, trace = 0)
+  fit1
+
+}
+
+
+

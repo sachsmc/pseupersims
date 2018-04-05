@@ -4,10 +4,15 @@
 \alias{run_one_replicate}
 \title{Run one replicate of the experiment}
 \usage{
-run_one_replicate(seed = floor(runif(1 * 1000)), output = "repouput.rds")
+run_one_replicate(seed, scenario = "A", missing.p = 0.1,
+  output = "repouput.rds")
 }
 \arguments{
 \item{seed}{random seed (integer)}
+
+\item{scenario}{data generation scenario, 0, A, B, or C}
+
+\item{missing.p}{proportion missing the binary outcome}
 
 \item{output}{path to output file}
 }

@@ -27,6 +27,35 @@ calc_roc <-
   }
 
 
+timedep_roc <- function(delta, Tout, MM, t.star = 26.5){
+
+  d.cox <- 1.0 * (delta == 1)
+  fit.m <- coxph(Surv(Tout, d.cox) ~ MM)
+
+  R.t <- Tout > t.star
+  risk <- predict(fit.m, type = "risk")
+  W.t <- sum(R.t * risk)
+  pi.k <- (R.t * risk) / W.t
+
+  cc.all <- sort(MM)
+
+  TP.t <- sapply(cc.all, function(cc) {
+
+    sum((MM > cc) * pi.k)
+
+  })
+
+  FP.t <- sapply(cc.all, function(cc) {
+
+    sum((MM > cc) * R.t) / sum(R.t)
+
+  })
+
+  data.frame(tpf = TP.t, fpf = FP.t)
+
+}
+
+
 calc_auc <- function(fpf, tpf) {
   n <- length(fpf)
   dx <- fpf[-n] - fpf[-1]

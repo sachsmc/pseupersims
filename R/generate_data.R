@@ -9,13 +9,14 @@
 #'                 B = simple multivariate, 5 variables are linearly associated,
 #'                 C = wonky, interactions, nonlinearities, etc.
 #' @param missing.p Proportion of missing binary Y values (random censoring)
+#' @param missing.site logical, if TRUE, censoring depends on a binary variable
 #'
 #' @return A data frame with X variables, censored survival times (competing risk w death), and true cumulative incidence at 26.5 weeks
 #'
 #' @export
 
 
-generate_data <- function(n = 500, scenario = "A", missing.p = .1) {
+generate_data <- function(n = 500, scenario = "A", missing.p = .1, missing.site = FALSE) {
 
   X5 <- matrix(rnorm(n * 5, mean = 0, sd = .1), ncol = 5)
   X52 <- X5 %*% matrix(0, nrow = 5, ncol = 5) + matrix(rnorm(n * 5, mean = 0, sd = .1), ncol = 5)
@@ -30,7 +31,7 @@ generate_data <- function(n = 500, scenario = "A", missing.p = .1) {
 
   } else if(scenario == "A") {
 
-    g1 <- exp(-2 + 15 * X[, 1])
+    g1 <- exp(-2 + 5 * X[, 1])
 
   } else if(scenario == "B") {
 
@@ -55,7 +56,7 @@ generate_data <- function(n = 500, scenario = "A", missing.p = .1) {
 
   k2 <- 2.5
   g2 <- 3.5
-  k1 <- exp(.5 * X[, 1])
+  k1 <- exp(1.5 * X[, 1])
 
   # ensure that g1 satisfies pweibull(26.5) ~= .20
   # ensure that k1 satisfies pweibull(26.5) ~= .07
@@ -83,11 +84,25 @@ generate_data <- function(n = 500, scenario = "A", missing.p = .1) {
     Tout[randcens] <- runif(length(randcens), 0, 26.5)
   }
 
-  trueP <- pweibull(26.5, scale = g1, shape = g2)
+  trueP <- sapply(1:n, function(i) {
+  integrate(f = function(x){
+    (pweibull(x, scale = g1[i], shape = g2)) *
+              dweibull(x, scale = k1[i], shape = k2)
+    },
+            -Inf, 26.5)$value
+  }) +
+    sapply(1:n, function(i) {
+      integrate(f = function(x){
+        (pweibull(26.5, scale = g1[i], shape = g2)) *
+          dweibull(x, scale = k1[i], shape = k2)
+      },
+      26.5, Inf)$value
+    })
+
 
   X <- apply(X, MAR = 2, standardize)
 
-  data.frame(Tout, delta, X, trueT = Y < 26.5,
+  data.frame(Tout, delta, X, trueT = Y < 26.5 & Y < Y2,
              trueP, Cen, Y, Y2)
 
 

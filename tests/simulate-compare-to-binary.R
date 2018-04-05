@@ -7,18 +7,23 @@ res.B <- mclapply(1:200, function(x) run_one_replicate(scenario = "B", output = 
 res.C <- mclapply(1:200, function(x) run_one_replicate(scenario = "C", output = sprintf("data/simresC-%03d.rds", x)))
 
 res.0 <- mclapply(1:200, function(x) run_one_replicate(scenario = "0", missing.p = .5,
-                                                       output = sprintf("data/miss.50/simres0-%03d.rds", x)))
+                                                       output = sprintf("data/missing.50/simres0-%03d.rds", x)))
 res.A <- mclapply(1:200, function(x) run_one_replicate(scenario = "A", missing.p = .5,
-                                                       output = sprintf("data/miss.50/simresA-%03d.rds", x)))
+                                                       output = sprintf("data/missing.50/simresA-%03d.rds", x)))
 res.B <- mclapply(1:200, function(x) run_one_replicate(scenario = "B", missing.p = .5,
-                                                       output = sprintf("data/miss.50/simresB-%03d.rds", x)))
+                                                       output = sprintf("data/missing.50/simresB-%03d.rds", x)))
 res.C <- mclapply(1:200, function(x) run_one_replicate(scenario = "C", missing.p = .5,
-                                                       output = sprintf("data/miss.50/simresC-%03d.rds", x)))
+                                                       output = sprintf("data/missing.50/simresC-%03d.rds", x)))
 
+res.0 <- mclapply(1:20, function(x) run_one_replicate(scenario = "0", output = sprintf("data/stupid/simres0-%03d.rds", x)))
+res.A <- mclapply(1:20, function(x) run_one_replicate(scenario = "A", output = sprintf("data/stupid/simresA-%03d.rds", x)))
+res.B <- mclapply(1:20, function(x) run_one_replicate(scenario = "B", output = sprintf("data/stupid/simresB-%03d.rds", x)))
+res.C <- mclapply(1:20, function(x) run_one_replicate(scenario = "C", output = sprintf("data/stupid/simresC-%03d.rds", x)))
 
 tabres <- function(res) {
 
   res %>% group_by(model) %>% summarize(mean.tbauc = mean(true.auc), sd.tbauc = sd(true.auc),
+                                        mean.tdauc = mean(td.auc), sd.tdauc = sd(td.auc),
                                         mean.bauc = mean(bauc), sd.bauc = sd(bauc),
                                         mean.pauc = mean(pauc), sd.pauc = sd(pauc),
                                         mean.bias = mean(bias), sd.prob = mean(sd),
@@ -29,10 +34,10 @@ tabres <- function(res) {
 
 
 
-res.0 <- analyze_sim("0")
-res.A <- analyze_sim("A")
-res.B <- analyze_sim("B")
-res.C <- analyze_sim("C")
+res.0 <- analyze_sim("0", "stupid", 20)
+res.A <- analyze_sim("A", "stupid", 20)
+res.B <- analyze_sim("B", "stupid", 20)
+res.C <- analyze_sim("C", "stupid", 20)
 
 
 lapply(list(tabres(res.0),

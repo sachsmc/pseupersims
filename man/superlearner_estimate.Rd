@@ -4,7 +4,8 @@
 \alias{superlearner_estimate}
 \title{Run the superlearner model with pseudo observations as the outcome}
 \usage{
-superlearner_estimate(data, Y = "cause1.pseudo", X = paste0("X", 1:20))
+superlearner_estimate(data, Y = "cause1.pseudo", X = paste0("X", 1:20), y0,
+  y1)
 }
 \arguments{
 \item{data}{A data frame with pseudo observations and a set of predictors}

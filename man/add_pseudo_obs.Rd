@@ -4,7 +4,7 @@
 \alias{add_pseudo_obs}
 \title{Add pseudo observations to a data frame}
 \usage{
-add_pseudo_obs(data, weights = rep(1, nrow(data)))
+add_pseudo_obs(data)
 }
 \arguments{
 \item{data}{A data frame with censored survival times for 2 outcomes}

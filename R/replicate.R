@@ -23,22 +23,26 @@ run_one_replicate <- function(seed, scenario = "A", missing.p = .1,  output = "r
   y0 <- min(indat2$cause1.pseudo) - abs(min(indat2$cause1.pseudo) * .05)
   y1 <- max(indat2$cause1.pseudo) * 1.05
 
-  #slearn.fit <- superlearner_estimate(indat2, Y = "Y", X = paste0("X", 1:20), y0, y1)
+  slearn.fit <- superlearner_estimate(indat2, Y = "cause1.pseudo", X = paste0("X", 1:20), y0, y1)
 
-  slearn.fit <- stupidlearner_estimate(indat2, Y = "cause1.pseudo", X = paste0("X", 1:20), y0, y1)
+  #slearn.fit <- stupidlearner_estimate(indat2, Y = "cause1.pseudo", X = paste0("X", 1:20), y0, y1)
 
   preder <- predict(slearn.fit, validat[, paste0("X", 1:20)])
 
-  # if(any(is.na(preder$pred[,1]))) {
-  #   predres <- preder$library.predict[, which.min(slearn.fit$cvRisk)]
-  # } else {
-  #   predres <- preder$pred[, 1]
-  # }
+   if(any(is.na(preder$pred[,1]))) {
+     predres <- preder$library.predict[, which.min(slearn.fit$cvRisk)]
+   } else {
+     predres <- preder$pred[, 1]
+   }
 
-  predres <- preder
+  #predres <- preder
   ## back transform
 
   validat$predres.pseudo <- predres #(exp(predres) * y1 + y0) / (exp(predres) + 1)
+
+  # plot(trueP ~ predres.pseudo, validat)
+  # abline(0, 1)
+
 
   indat2$binY <- with(indat2, ifelse(Tout > 26.5, 0, ifelse(delta == 1, 1, NA)))
 #

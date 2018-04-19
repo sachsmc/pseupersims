@@ -30,7 +30,7 @@ superlearner_estimate <- function(data, Y = "cause1.pseudo", X = paste0("X", 1:2
                       "SL.rpart", "SL.glmnet" , c("SL.polymars", "screen.corP")), learners$names)
 
   sl.full <- SuperLearner(Y = YY, X = XX, SL.library = SL.library,
-                          verbose = FALSE, method = "method.NNLS")
+                          verbose = FALSE, method = "method.pseudoAUC")
 
 
   sl.full

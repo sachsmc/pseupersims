@@ -81,9 +81,10 @@ optimize_auc <-
 
     tomax <- function(beta) {
 
-      Xin <- (Z %*% beta)
+      beta <- beta
+      Xin <- ( Z %*% beta)
       roc <- calc_roc(Xin, Y)
-      (1 - (calc_auc(roc$fpf, roc$tpf)))
+      (1 - (calc_auc(roc$fpf, roc$tpf))) + 100 * sum(abs(beta))
 
     }
 

@@ -23,8 +23,8 @@ res.C <- mclapply(1:20, function(x) run_one_replicate(scenario = "C", output = s
 tabres <- function(res) {
 
   res %>% group_by(model) %>% summarize(mean.tbauc = mean(true.auc), sd.tbauc = sd(true.auc),
-                                        mean.tdauc = mean(td.auc), sd.tdauc = sd(td.auc),
-                                        mean.bauc = mean(bauc), sd.bauc = sd(bauc),
+                                        mean.int = mean(cal.int), sd.int = sd(cal.int),
+                                        mean.slp = mean(cal.slp, na.rm = TRUE), sd.slp = sd(cal.slp, na.rm = TRUE),
                                         mean.pauc = mean(pauc), sd.pauc = sd(pauc),
                                         mean.bias = mean(bias), sd.prob = mean(sd),
                                         mse = mean(bias^2)
@@ -34,10 +34,10 @@ tabres <- function(res) {
 
 
 
-res.0 <- analyze_sim("0", "stupid", 20)
-res.A <- analyze_sim("A", "stupid", 20)
-res.B <- analyze_sim("B", "stupid", 20)
-res.C <- analyze_sim("C", "stupid", 20)
+res.0 <- analyze_sim("0", "missing.50", 200)
+res.A <- analyze_sim("A", "missing.50", 200)
+res.B <- analyze_sim("B", "missing.50", 200)
+res.C <- analyze_sim("C", "missing.50", 200)
 
 
 lapply(list(tabres(res.0),

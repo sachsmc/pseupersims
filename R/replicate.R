@@ -23,7 +23,7 @@ run_one_replicate <- function(seed, scenario = "A", missing.p = .1,  output = "r
   y0 <- min(indat2$cause1.pseudo) - abs(min(indat2$cause1.pseudo) * .05)
   y1 <- max(indat2$cause1.pseudo) * 1.05
 
-  slearn.fit <- superlearner_estimate(indat2, Y = "cause1.pseudo", X = paste0("X", 1:20), y0, y1)
+  slearn.fit <- superlearner_estimate(indat2, Y = "cause1.pseudo", X = paste0("X", 1:20), y0, y1, Y2 = "cause2.pseudo")
 
   #slearn.fit <- stupidlearner_estimate(indat2, Y = "cause1.pseudo", X = paste0("X", 1:20), y0, y1)
 
@@ -55,7 +55,7 @@ run_one_replicate <- function(seed, scenario = "A", missing.p = .1,  output = "r
 
   validat$predres.binary <- bin.predres
 
-  # pstest <- with(validat, calc_roc(predres.pseudo, trueT))
+  # pstest <- with(validat, calc_roc(predres.pseudo, trueT, cause2.pseudo))
   # plot(tpf ~ fpf, data = pstest, col = "blue", type = "l")
   # bitest <- with(validat, calc_roc(predres.binary, trueT))
   # lines(tpf ~ fpf, data = bitest)

@@ -9,14 +9,14 @@ standardize <- function(x) {
 
 
 calc_roc <-
-  function(X, pseu) {
+  function(X, pseu, pseu2) {
     ## compute roc curve using pseudo values
 
     cuts <- sort(unique(X))
     cutin <- cuts[-c(1, length(cuts))]
     res.0 <- rbind(c(1, 1), t(sapply(cutin, function(cth) {
       c(sum(pseu * as.numeric(X > cth)) / sum(pseu),
-        sum((1 - pseu) * as.numeric(X > cth)) / sum(1 - pseu))
+        sum((1 - pseu - pseu2) * as.numeric(X > cth)) / sum(1 - pseu - pseu2))
     })), c(0, 0))
     res <- as.data.frame(res.0)
     res <- data.frame(lapply(res, function(x)
@@ -74,8 +74,9 @@ calc_pAUC <- function(predictions, labels, folds) {
 
 
 optimize_auc <-
-  function(Z, Y) {
+  function(Z, Y, pseu2) {
     ## Z is a matrix of predictions, Y are pseudo-observations
+    ## pseu2 are the pseudo observations for the competing risk
     ## compute the linear combination of Z that maximizes the AUC
 
 
@@ -83,7 +84,7 @@ optimize_auc <-
 
       beta <- beta
       Xin <- ( Z %*% beta)
-      roc <- calc_roc(Xin, Y)
+      roc <- calc_roc(Xin, Y, pseu2)
       (1 - (calc_auc(roc$fpf, roc$tpf))) + 100 * sum(abs(beta))
 
     }
@@ -100,7 +101,15 @@ optimize_auc <-
 
   }
 
+my.SuperLearner.control <- function(saveFitLibrary = TRUE, trimLogit = 0.001, ...) {
+  if(trimLogit > 0.5) {
+    warning('trimLogit must be less than 0.5, will replace with trimLogit = 0.001')
+    trimLogit <- 0.001
+  }
+  list(saveFitLibrary = saveFitLibrary, trimLogit = trimLogit, ...)
+}
 
+assignInNamespace("SuperLearner.control", my.SuperLearner.control, "SuperLearner")
 
 method.pseudoAUC <- function() {
   out <- list(
@@ -119,11 +128,11 @@ method.pseudoAUC <- function() {
                            verbose,
                            ...) {
       cvRisk <- apply(Z, 2, function(x) {
-        rocin <- calc_roc(x, Y)
+        rocin <- calc_roc(x, Y, control$pseu2)
         1 - (calc_auc(rocin$fpf, rocin$tpf))
       })
 
-      coef <- tryCatch(optimize_auc(Z, Y), error = function(e) rep(NA, ncol(Z)),
+      coef <- tryCatch(optimize_auc(Z, Y, control$pseu2), error = function(e) rep(NA, ncol(Z)),
                        warning = function(e) rep(NA, ncol(Z)))
       out <- list(cvRisk = cvRisk,
                   coef = coef,

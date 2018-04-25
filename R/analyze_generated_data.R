@@ -9,10 +9,12 @@
 
 
 
-superlearner_estimate <- function(data, Y = "cause1.pseudo", X = paste0("X", 1:20), y0, y1) {
+superlearner_estimate <- function(data, Y = "cause1.pseudo", X = paste0("X", 1:20), y0, y1, Y2 = "cause2.pseudo") {
 
   XX <- data[, X]
   YY <- data[[Y]] #log((data[[Y]] - y0) / (y1 - data[[Y]]))
+
+  Pseu2 <- data[[Y2]]
 
   tune = list(ntrees = c(100, 200),
               max_depth = 1:3,
@@ -30,7 +32,7 @@ superlearner_estimate <- function(data, Y = "cause1.pseudo", X = paste0("X", 1:2
                       "SL.rpart", "SL.glmnet" , c("SL.polymars", "screen.corP")), learners$names)
 
   sl.full <- SuperLearner(Y = YY, X = XX, SL.library = SL.library,
-                          verbose = FALSE, method = "method.pseudoAUC")
+                          verbose = FALSE, method = "method.pseudoAUC", control = list(pseu2 = Pseu2))
 
 
   sl.full

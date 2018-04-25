@@ -15,10 +15,6 @@ res.B <- mclapply(1:200, function(x) run_one_replicate(scenario = "B", missing.p
 res.C <- mclapply(1:200, function(x) run_one_replicate(scenario = "C", missing.p = .5,
                                                        output = sprintf("data/missing.50/simresC-%03d.rds", x)))
 
-res.0 <- mclapply(1:20, function(x) run_one_replicate(scenario = "0", output = sprintf("data/stupid/simres0-%03d.rds", x)))
-res.A <- mclapply(1:20, function(x) run_one_replicate(scenario = "A", output = sprintf("data/stupid/simresA-%03d.rds", x)))
-res.B <- mclapply(1:20, function(x) run_one_replicate(scenario = "B", output = sprintf("data/stupid/simresB-%03d.rds", x)))
-res.C <- mclapply(1:20, function(x) run_one_replicate(scenario = "C", output = sprintf("data/stupid/simresC-%03d.rds", x)))
 
 tabres <- function(res) {
 

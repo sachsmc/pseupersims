@@ -64,10 +64,10 @@ calc_auc <- function(fpf, tpf) {
 
 }
 
-calc_pAUC <- function(predictions, labels, folds) {
+calc_pAUC <- function(predictions, labels, pseu2) {
 
   if(length(unique(predictions)) < 3) return(.5)
-  inroc <- calc_roc(predictions, labels)
+  inroc <- calc_roc(predictions, labels, pseu2)
   calc_auc(inroc$fpf, inroc$tpf)
 
 }

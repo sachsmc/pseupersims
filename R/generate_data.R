@@ -122,11 +122,12 @@ generate_data <- function(n = 500, scenario = "A", missing.p = .1, missing.site 
 
 add_pseudo_obs <- function(data) {
 
-  psuo <- pseudoci(data$Tout, event = data$delta, tmax = 26.5)
+  tme <- c(10, 15, 26.5, 50, 75)
+  psuo <- pseudoci(data$Tout, event = data$delta, tmax = c(10, 15, 26.5, 50, 75))
 
-  data$cause1.pseudo <- psuo$pseudo$cause1[, 1]  # this is the one we're analyzing
-  data$cause2.pseudo <- psuo$pseudo$cause2[, 1]
 
-  data
+  data <- do.call(rbind, lapply(1:length(tme), function(x) cbind(data, cause1.pseudo = psuo$pseudo$cause1[, x],
+                                                         cause2.pseudo = psuo$pseudo$cause2[, x], time = tme[x])))
+
 
 }

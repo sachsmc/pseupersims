@@ -16,18 +16,15 @@ run_one_replicate <- function(seed, scenario = "A", missing.p = .1,  output = "r
   if(!missing(seed)) set.seed(seed)
 
   indat <- generate_data(n = 500, scenario = scenario, missing.p = missing.p)
-  validat <- add_pseudo_obs(generate_data(scenario = scenario, missing.p = missing.p))
+  validat <- subset(add_pseudo_obs(generate_data(scenario = scenario, missing.p = missing.p)), time == 26.5)
 
   indat2 <- add_pseudo_obs(indat)
 
-  y0 <- min(indat2$cause1.pseudo) - abs(min(indat2$cause1.pseudo) * .05)
-  y1 <- max(indat2$cause1.pseudo) * 1.05
-
-  slearn.fit <- superlearner_estimate(indat2, Y = "cause1.pseudo", X = paste0("X", 1:20), y0, y1, Y2 = "cause2.pseudo")
+  slearn.fit <- superlearner_estimate(indat2, Y = "cause1.pseudo", X = c("time", paste0("X", 1:20)), y0, y1, Y2 = "cause2.pseudo")
 
   #slearn.fit <- stupidlearner_estimate(indat2, Y = "cause1.pseudo", X = paste0("X", 1:20), y0, y1)
 
-  preder <- predict(slearn.fit, validat[, paste0("X", 1:20)])
+  preder <- predict(slearn.fit, validat[, c("time", paste0("X", 1:20))])
 
    if(any(is.na(preder$pred[,1]))) {
      predres <- preder$library.predict[, which.min(slearn.fit$cvRisk)]
@@ -49,19 +46,30 @@ run_one_replicate <- function(seed, scenario = "A", missing.p = .1,  output = "r
 #   indat2$binY <- rbinom(500, 1, indat$trueP)
 #   indat2$binY[which(indat2$binY == 1)[1:100]]  <- NA
 
-  slearn.binfit <- stupidlearner_binaryestimate(subset(indat2, !is.na(binY)), Y = "binY", X = paste0("X", 1:20))
+  slearn.binfit <- superlearner_binaryestimate(subset(indat2, !is.na(binY)), Y = "binY", X = paste0("X", 1:20))
 
-  bin.predres <-  predict(slearn.binfit, validat[, paste0("X", 1:20)], type = "response")#$pred[, 1]
+  bin.predres <-  predict(slearn.binfit, validat[, paste0("X", 1:20)], type = "response")$pred[, 1]
 
   validat$predres.binary <- bin.predres
 
+  ## cox model strawman
+
+
+  fit.cox <- cv.glmnet(as.matrix(indat2[, paste0("X", 1:20)]), cbind(time = indat2$Tout, status = 1.0 * indat2$delta == 1),
+                       family = "cox")
+
+
+  est.cox <- predict(fit.cox, newx = as.matrix(validat[, paste0("X", 1:20)]))[, 1]
+  validat$predres.cox <- est.cox
+
   # pstest <- with(validat, calc_roc(predres.pseudo, trueT, cause2.pseudo))
   # plot(tpf ~ fpf, data = pstest, col = "blue", type = "l")
-  # bitest <- with(validat, calc_roc(predres.binary, trueT))
+  # bitest <- with(validat, calc_roc(predres.binary, trueT, cause2.pseudo))
   # lines(tpf ~ fpf, data = bitest)
-  # trtest <- with(validat, calc_roc(trueP, trueT))
+  # trtest <- with(validat, calc_roc(trueP, trueT, cause2.pseudo))
   # lines(tpf ~ fpf, data = trtest, col = "red")
-
+  # coxtst <- with(validat, calc_roc(predres.cox, trueT, cause2.pseudo))
+  # lines(tpf ~ fpf, data = coxtst, col = "green")
 
   saveRDS(validat, file = output)
 

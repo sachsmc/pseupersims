@@ -28,8 +28,8 @@ analyze_sim <- function(scenario, folder, n = 200) {
     bauc.pseudo <- with(subset(indat, !is.na(binY)),  performance(prediction(predres.pseudo, binY), "auc"))@y.values[[1]]
     bauc.binary <- with(subset(indat, !is.na(binY)),  performance(prediction(predres.binary, binY), "auc"))@y.values[[1]]
 
-    pauc.pseudo <- with(indat, calc_pAUC(predres.pseudo, cause1.pseudo))
-    pauc.binary <- with(indat, calc_pAUC(predres.binary, cause1.pseudo))
+    pauc.pseudo <- with(indat, calc_pAUC(predres.pseudo, cause1.pseudo, cause2.pseudo))
+    pauc.binary <- with(indat, calc_pAUC(predres.binary, cause1.pseudo, cause2.pseudo))
 
     bias.pseudo <- with(indat, mean((trueP - predres.pseudo)))
     bias.binary <- with(indat, mean(trueP - predres.binary))

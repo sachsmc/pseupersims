@@ -1,10 +1,10 @@
 library(parallel)
 library(dplyr)
 
-res.0 <- mclapply(1:200, function(x) run_one_replicate(scenario = "0", output = sprintf("data/simres0-%03d.rds", x)))
-res.A <- mclapply(1:200, function(x) run_one_replicate(scenario = "A", output = sprintf("data/simresA-%03d.rds", x)))
-res.B <- mclapply(1:200, function(x) run_one_replicate(scenario = "B", output = sprintf("data/simresB-%03d.rds", x)))
-res.C <- mclapply(1:200, function(x) run_one_replicate(scenario = "C", output = sprintf("data/simresC-%03d.rds", x)))
+res.0 <- mclapply(1:20, function(x) run_one_replicate(scenario = "0", output = sprintf("data/missing.10/simres0-%03d.rds", x)))
+res.A <- mclapply(1:20, function(x) run_one_replicate(scenario = "A", output = sprintf("data/missing.10/simresA-%03d.rds", x)))
+res.B <- mclapply(1:20, function(x) run_one_replicate(scenario = "B", output = sprintf("data/missing.10/simresB-%03d.rds", x)))
+res.C <- mclapply(1:20, function(x) run_one_replicate(scenario = "C", output = sprintf("data/missing.10/simresC-%03d.rds", x)))
 
 res.0 <- mclapply(1:200, function(x) run_one_replicate(scenario = "0", missing.p = .5,
                                                        output = sprintf("data/missing.50/simres0-%03d.rds", x)))
@@ -30,10 +30,10 @@ tabres <- function(res) {
 
 
 
-res.0 <- analyze_sim("0", "missing.50", 200)
-res.A <- analyze_sim("A", "missing.50", 200)
-res.B <- analyze_sim("B", "missing.50", 200)
-res.C <- analyze_sim("C", "missing.50", 200)
+res.0 <- analyze_sim("0", "missing.10", 200)
+res.A <- analyze_sim("A", "missing.10", 200)
+res.B <- analyze_sim("B", "missing.10", 200)
+res.C <- analyze_sim("C", "missing.10", 200)
 
 
 lapply(list(tabres(res.0),

@@ -2,8 +2,9 @@
 
 export(add_pseudo_obs)
 export(generate_data)
-export(local_slope)
+export(pseudo_lime)
 export(pseudoci.weighted)
 export(run_one_replicate)
+export(shift_pred)
 export(superlearner_estimate)
 import(survival)

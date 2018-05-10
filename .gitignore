@@ -1,5 +1,5 @@
-.Rbuildignore
-.Rhistory
-.Rproj
 .Rproj.user
+.Rhistory
+.RData
+.Ruserdata
 data/

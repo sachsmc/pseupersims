@@ -9,18 +9,17 @@
 #'                 B = simple multivariate, 5 variables are linearly associated,
 #'                 C = wonky, interactions, nonlinearities, etc.
 #' @param missing.p Proportion of missing binary Y values (random censoring)
-#' @param missing.site logical, if TRUE, censoring depends on a binary variable
 #'
 #' @return A data frame with X variables, censored survival times (competing risk w death), and true cumulative incidence at 26.5 weeks
 #'
 #' @export
 
 
-generate_data <- function(n = 500, scenario = "A", missing.p = .1, missing.site = FALSE) {
+generate_data <- function(n = 500, scenario = "A", missing.p = .2) {
 
   X5 <- matrix(rnorm(n * 5, mean = 0, sd = .1), ncol = 5)
-  X52 <- X5 %*% matrix(0, nrow = 5, ncol = 5) + matrix(rnorm(n * 5, mean = 0, sd = .1), ncol = 5)
-  X53 <- X52 %*% matrix(0, nrow = 5, ncol = 5) + matrix(rnorm(n * 5, mean = 0, sd = .5), ncol = 5)
+  X52 <- X5 %*% matrix(.25, nrow = 5, ncol = 5) + matrix(rnorm(n * 5, mean = 0, sd = .1), ncol = 5)
+  X53 <- X52 %*% matrix(.15, nrow = 5, ncol = 5) + matrix(rnorm(n * 5, mean = 0, sd = .5), ncol = 5)
   X54 <- X53 %*% matrix(.05, nrow = 5, ncol = 5) + matrix(rnorm(n * 5, mean = 0, sd = .65), ncol = 5)
 
   X <- cbind(X5, X52, X53, X54)
@@ -37,7 +36,7 @@ generate_data <- function(n = 500, scenario = "A", missing.p = .1, missing.site 
 
     beta.b <- c(1.75, 1.5, 2.01, -3.02, -2.03) / 3
 
-    g1 <- sqrt(exp( X[, c(1, 6, 11, 16, 20)] %*% beta.b))
+    g1 <- sqrt(exp( X[, c(1, 6, 11, 16, 20)] %*% beta.b + X[, 2] * X[, 3]))
 
 
   } else if(scenario == "C") {
@@ -48,7 +47,7 @@ generate_data <- function(n = 500, scenario = "A", missing.p = .1, missing.site 
                 X2[, 4] * ifelse(X2[, 4] < median(X2[, 4]), 0, 1))
 
 
-    beta.c <- c(2.1, 2.4, -4.1, -1.2, -4.3, -1.5, 6.7, 1.5) / 4
+    beta.c <- c(1.1, 1.4, -2.1, -1.2, -2.3, -1.5, 6.7, .5) / 4
 
     g1 <- sqrt(exp(X2 %*% beta.c))
 

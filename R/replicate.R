@@ -11,16 +11,16 @@
 #'
 #' @export
 
-run_one_replicate <- function(seed, scenario = "A", missing.p = .1,  output = "repouput.rds") {
+run_one_replicate <- function(seed, scenario = "A", missing.p = .2,  output = "repouput.rds") {
 
   if(!missing(seed)) set.seed(seed)
 
-  indat <- generate_data(n = 500, scenario = scenario, missing.p = missing.p)
+  indat <- generate_data(n = 1000, scenario = scenario, missing.p = missing.p)
   validat <- subset(add_pseudo_obs(generate_data(scenario = scenario, missing.p = missing.p)), time == 26.5)
 
   indat2 <- add_pseudo_obs(indat)
 
-  slearn.fit <- superlearner_estimate(indat2, Y = "cause1.pseudo", X = c("time", paste0("X", 1:20)), y0, y1, Y2 = "cause2.pseudo")
+  slearn.fit <- superlearner_estimate(indat2, Y = "cause1.pseudo", X = c("time", paste0("X", 1:20)), Y2 = "cause2.pseudo")
 
   #slearn.fit <- stupidlearner_estimate(indat2, Y = "cause1.pseudo", X = paste0("X", 1:20), y0, y1)
 

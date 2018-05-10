@@ -1,20 +1,30 @@
 library(parallel)
 library(dplyr)
 
-res.0 <- mclapply(1:20, function(x) run_one_replicate(scenario = "0", output = sprintf("data/missing.10/simres0-%03d.rds", x)))
-res.A <- mclapply(1:20, function(x) run_one_replicate(scenario = "A", output = sprintf("data/missing.10/simresA-%03d.rds", x)))
-res.B <- mclapply(1:20, function(x) run_one_replicate(scenario = "B", output = sprintf("data/missing.10/simresB-%03d.rds", x)))
-res.C <- mclapply(1:20, function(x) run_one_replicate(scenario = "C", output = sprintf("data/missing.10/simresC-%03d.rds", x)))
+cl <- makeCluster(getOption("cl.cores", 8))
 
-res.0 <- mclapply(1:200, function(x) run_one_replicate(scenario = "0", missing.p = .5,
-                                                       output = sprintf("data/missing.50/simres0-%03d.rds", x)))
-res.A <- mclapply(1:200, function(x) run_one_replicate(scenario = "A", missing.p = .5,
-                                                       output = sprintf("data/missing.50/simresA-%03d.rds", x)))
-res.B <- mclapply(1:200, function(x) run_one_replicate(scenario = "B", missing.p = .5,
-                                                       output = sprintf("data/missing.50/simresB-%03d.rds", x)))
-res.C <- mclapply(1:200, function(x) run_one_replicate(scenario = "C", missing.p = .5,
-                                                       output = sprintf("data/missing.50/simresC-%03d.rds", x)))
+clusterEvalQ(cl, devtools::load_all())
 
+ree.scen <- function(scen, mp, ptb =TRUE) {
+
+res.X <- clusterApplyLB(cl, 1:200, function(x){
+  noret <- run_one_replicate(scenario = scen, missing.p = mp, output = sprintf("data/missing%.2f/simres%s-%03d.rds", mp, scen, x))
+  if(ptb) {
+  noret2 <- run_one_perturb(scenario = scen, missing.p = mp, output = sprintf("data/missing%.2f/pturb%s-%03d.rds", mp, scen, x))
+  }
+  })
+
+}
+
+ree.scen("0", .2, ptb = FALSE)
+ree.scen("A", .2)
+ree.scen("B", .2)
+ree.scen("C", .2)
+
+ree.scen("0", .5, ptb = FALSE)
+ree.scen("A", .5)
+ree.scen("B", .5)
+ree.scen("C", .5)
 
 tabres <- function(res) {
 
@@ -30,10 +40,10 @@ tabres <- function(res) {
 
 
 
-res.0 <- analyze_sim("0", "missing.10", 200)
-res.A <- analyze_sim("A", "missing.10", 200)
-res.B <- analyze_sim("B", "missing.10", 200)
-res.C <- analyze_sim("C", "missing.10", 200)
+res.0 <- analyze_sim("0", "missing.50", 20)
+res.A <- analyze_sim("A", "missing.50", 20)
+res.B <- analyze_sim("B", "missing.50", 20)
+res.C <- analyze_sim("C", "missing.50", 20)
 
 
 lapply(list(tabres(res.0),

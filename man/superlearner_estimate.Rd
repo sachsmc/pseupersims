@@ -4,13 +4,19 @@
 \alias{superlearner_estimate}
 \title{Run the superlearner model with pseudo observations as the outcome}
 \usage{
-superlearner_estimate(data, Y = "cause1.pseudo", X = paste0("X", 1:20), y0,
-  y1)
+superlearner_estimate(data, Y = "cause1.pseudo", X = paste0("X", 1:20),
+  Y2 = "cause2.pseudo", SL.library = NULL)
 }
 \arguments{
 \item{data}{A data frame with pseudo observations and a set of predictors}
 
-\item{formula}{A formula describing the model}
+\item{Y}{character string for the outcome variable in data}
+
+\item{X}{character vector for the predictor variables in data}
+
+\item{Y2}{character string for the pseudo-observations of the competing outcome}
+
+\item{SL.library}{optional list of SL library methods}
 }
 \value{
 A fitted model object

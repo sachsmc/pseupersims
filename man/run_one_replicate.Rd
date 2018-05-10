@@ -4,7 +4,7 @@
 \alias{run_one_replicate}
 \title{Run one replicate of the experiment}
 \usage{
-run_one_replicate(seed, scenario = "A", missing.p = 0.1,
+run_one_replicate(seed, scenario = "A", missing.p = 0.2,
   output = "repouput.rds")
 }
 \arguments{

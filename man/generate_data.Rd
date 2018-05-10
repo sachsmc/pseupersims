@@ -4,8 +4,7 @@
 \alias{generate_data}
 \title{Generate survival data for analysis}
 \usage{
-generate_data(n = 500, scenario = "A", missing.p = 0.1,
-  missing.site = FALSE)
+generate_data(n = 500, scenario = "A", missing.p = 0.2)
 }
 \arguments{
 \item{n}{Sample size}
@@ -16,8 +15,6 @@ B = simple multivariate, 5 variables are linearly associated,
 C = wonky, interactions, nonlinearities, etc.}
 
 \item{missing.p}{Proportion of missing binary Y values (random censoring)}
-
-\item{missing.site}{logical, if TRUE, censoring depends on a binary variable}
 }
 \value{
 A data frame with X variables, censored survival times (competing risk w death), and true cumulative incidence at 26.5 weeks

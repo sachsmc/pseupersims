@@ -12,6 +12,7 @@
 #'
 #' @export
 #'
+
 shift_pred  <- function(SLobject, X, predictor) {
 
   Xu <- X
@@ -28,19 +29,19 @@ shift_pred  <- function(SLobject, X, predictor) {
 
     cands <- sort(unique(X[, predictor]))
 
-    Xd[, predictor] <- factor(ifelse(XX[, predictor]==cands[1], cands[2], cands[1]))
-    Xu[, predictor] <- factor(ifelse(XX[, predictor]==cands[1], cands[2], cands[1]))
+    Xd[, predictor] <- cands[1]
+    Xu[, predictor] <- cands[2]
   }
 
-  pu <- predict(SLobject, Xu)$pred
-  pd <- pu
+  pu <- predict(SLobject, Xu)$pred[, 1]
+  pd <- predict(SLobject, Xd)$pred[, 1]
 
   p <- list(pu = pu, pd = pd)
 
 }
 
 
-
+#' @export
 pseudo_lime <- function(SLobject, X) {
   Xnumcols <- dim(X)[2]
   # Xnumcols <- 1
@@ -51,12 +52,12 @@ pseudo_lime <- function(SLobject, X) {
   preddown <- as.data.frame(matrix(NA, dim(X)[1], dim(X)[2]))
   colnames(preddown) <- Xnames
 
-  orig_pred <- predict(SLobject, X)
+  orig_pred <- predict(SLobject, X)$pred[, 1]
 
   for (i in 1:Xnumcols) {
     sp <- shift_pred(SLobject, X, i)
-    predup[, i] <- sp[["pu"]] - orig_pred$pred
-    preddown[, i] <- sp[["pd"]] - orig_pred$pred
+    predup[, i] <- sp[["pu"]] - orig_pred
+    preddown[, i] <- sp[["pd"]] - orig_pred
   }
 
   pred <- list(predup = predup, preddown = preddown, orig_pred = orig_pred)

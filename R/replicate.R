@@ -15,7 +15,7 @@ run_one_replicate <- function(seed, scenario = "A", missing.p = .2,  output = "r
 
   if(!missing(seed)) set.seed(seed)
 
-  indat <- generate_data(n = 1000, scenario = scenario, missing.p = missing.p)
+  indat <- generate_data(n = 500, scenario = scenario, missing.p = missing.p)
   validat <- subset(add_pseudo_obs(generate_data(scenario = scenario, missing.p = missing.p)), time == 26.5)
 
   indat2 <- add_pseudo_obs(indat)

@@ -4,6 +4,7 @@ analyze_sim <- function(scenario, folder, n = 200) {
   resem <- do.call(rbind, lapply(1:n, function(i) {
 
     fnam <- sprintf("data/%s/simres%s-%03d.rds", folder, scenario, i)
+    if(!file.exists(fnam)) return(NULL)
     res.tmp <- readRDS(fnam)
     out.tmp <- res.tmp[, -c(3:22)]
     out.tmp$replicate <- i
@@ -19,6 +20,7 @@ analyze_sim <- function(scenario, folder, n = 200) {
   for(j in 1:n) {
 
     indat <- subset(resem, replicate == j)
+    if(nrow(indat) == 0) next
     true.auc <- with(indat, c(performance(prediction(predres.pseudo, trueY), "auc")@y.values[[1]],
                               performance(prediction(predres.binary, trueY), "auc")@y.values[[1]],
                               performance(prediction(trueP, trueY), "auc")@y.values[[1]]))

@@ -23,11 +23,11 @@ run_one_perturb <- function(seed, scenario = "A", missing.p = .2,  output = "rep
 
 
   inlim <- subset(indat2[, c("time", paste0("X", 1:20))], time == 26.5)
-  inlim <- inlim[sample(1:nrow(inlim), 100)]
+  inlim <- inlim[sample(1:nrow(inlim), 100),]
   lime_est <- pseudo_lime(slearn.fit, X = inlim)$predup[, -1]
   validat <- colMeans(lime_est)
 
-  saveRDS(validat, file = output)
+  saveRDS(lime_est, file = output)
 
 
 }

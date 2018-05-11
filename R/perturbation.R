@@ -45,7 +45,7 @@ shift_pred  <- function(SLobject, X, predictor) {
 pseudo_lime <- function(SLobject, X) {
   Xnumcols <- dim(X)[2]
   # Xnumcols <- 1
-  Xnames <- names(X)
+  Xnames <- colnames(X)
 
   predup <- as.data.frame(matrix(NA, dim(X)[1], dim(X)[2]))
   colnames(predup) <- Xnames

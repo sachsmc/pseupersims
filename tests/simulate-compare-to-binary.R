@@ -40,10 +40,10 @@ tabres <- function(res) {
 
 
 
-res.0 <- analyze_sim("0", "missing.50", 20)
-res.A <- analyze_sim("A", "missing.50", 20)
-res.B <- analyze_sim("B", "missing.50", 20)
-res.C <- analyze_sim("C", "missing.50", 20)
+res.0 <- analyze_sim("0", "missing0.20", 200)
+res.A <- analyze_sim("A", "missing0.20", 200)
+res.B <- analyze_sim("B", "missing0.20", 200)
+res.C <- analyze_sim("C", "missing.20", 20)
 
 
 lapply(list(tabres(res.0),

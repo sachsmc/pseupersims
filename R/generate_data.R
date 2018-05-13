@@ -51,6 +51,14 @@ generate_data <- function(n = 500, scenario = "A", missing.p = .2) {
 
     g1 <- sqrt(exp(X2 %*% beta.c))
 
+  } else if(scenario == "D") { # interaction model to test perturbation
+
+    X[, 19] <- rbinom(n, 1, .5)
+
+    g1 <- exp(ifelse(X[, 19] == 1,
+                 1 * X[, 20],
+                 -1 * X[, 20] ))
+
   }
 
   k2 <- 2.5
@@ -99,7 +107,7 @@ generate_data <- function(n = 500, scenario = "A", missing.p = .2) {
     })
 
 
-  X <- apply(X, MAR = 2, standardize)
+  if(scenario != "D") X <- apply(X, MAR = 2, standardize)
 
   data.frame(Tout, delta, X, trueT = Y < 26.5 & Y < Y2,
              trueP, Cen, Y, Y2)

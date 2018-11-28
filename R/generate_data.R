@@ -8,6 +8,7 @@
 #'                 is linearly associated with IRIS,
 #'                 B = simple multivariate, 5 variables are linearly associated,
 #'                 C = wonky, interactions, nonlinearities, etc.
+#'                 D = same as B but censoring depends on covariates
 #' @param missing.p Proportion of missing binary Y values (random censoring)
 #'
 #' @return A data frame with X variables, censored survival times (competing risk w death), and true cumulative incidence at 26.5 weeks
@@ -51,13 +52,14 @@ generate_data <- function(n = 500, scenario = "A", missing.p = .2) {
 
     g1 <- sqrt(exp(X2 %*% beta.c))
 
-  } else if(scenario == "D") { # interaction model to test perturbation
+  } else if(scenario == "D") { # model in which censoring depends on a covariate
 
-    X[, 19] <- rbinom(n, 1, .5)
+    beta.b <- c(1.75, 1.5, 2.01, -3.02, -2.03) / 3
 
-    g1 <- exp(ifelse(X[, 19] == 1,
-                 1 * X[, 20],
-                 -1 * X[, 20] ))
+    g1 <- sqrt(exp( X[, c(1, 6, 11, 16, 20)] %*% beta.b + X[, 2] * X[, 3]))
+    censb1 <- sqrt(exp( X[, c(1, 6, 11, 16, 20)] %*% beta.b / 3))
+    cskl <- (26.5 / ((-log(1 - .14)) ^ (1)))
+    censb1 <- censb1 * mean(cskl / censb1)
 
   }
 
@@ -78,6 +80,12 @@ generate_data <- function(n = 500, scenario = "A", missing.p = .2) {
   Y2 <- rweibull(n, scale = k1, shape = k2)
 
   Cen <- runif(n, quantile(c(Y, Y2), .05), max(c(Y, Y2)))
+
+  if(scenario == "D"){
+
+    Cen <- rweibull(n, scale = censb1, shape = 1)
+
+  }
 
   Tout <- pmin(Y, Y2, Cen)
   delta <- ifelse(Cen < Y & Cen < Y2, 0,
@@ -107,9 +115,9 @@ generate_data <- function(n = 500, scenario = "A", missing.p = .2) {
     })
 
 
-  if(scenario != "D") X <- apply(X, MAR = 2, standardize)
+  X <- apply(X, MAR = 2, standardize)
 
-  data.frame(Tout, delta, X, trueT = Y < 26.5 & Y < Y2,
+  data.frame(id = 1:length(Tout), Tout, delta, X, trueT = Y < 26.5 & Y < Y2,
              trueP, Cen, Y, Y2)
 
 
@@ -121,16 +129,16 @@ generate_data <- function(n = 500, scenario = "A", missing.p = .2) {
 #' Allow arbitrary names
 #'
 #' @param data A data frame with censored survival times for 2 outcomes
-#' @param weights Vector of probability weights
+#' @param tme Vector of times at which to compute pseudo values
 #' @return The data frame with pseudo observations added for t = 26.5 weeks
 #'
 #'
 #' @export
 
-add_pseudo_obs <- function(data) {
+add_pseudo_obs <- function(data, tme = c(10, 15, 26.5, 50, 75)) {
 
-  tme <- c(10, 15, 26.5, 50, 75)
-  psuo <- pseudoci(data$Tout, event = data$delta, tmax = c(10, 15, 26.5, 50, 75))
+
+  psuo <- pseudoci(data$Tout, event = data$delta, tmax = tme)
 
 
   data <- do.call(rbind, lapply(1:length(tme), function(x) cbind(data, cause1.pseudo = psuo$pseudo$cause1[, x],

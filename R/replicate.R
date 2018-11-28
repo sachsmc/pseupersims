@@ -41,12 +41,17 @@ run_one_replicate <- function(seed, scenario = "A", missing.p = .2,  output = "r
   # abline(0, 1)
 
 
-  indat2$binY <- with(indat2, ifelse(Tout > 26.5, 0, ifelse(delta == 1, 1, NA)))
+  indat2$binY <- with(indat2, ifelse(Tout > 26.5, 0, ifelse(delta == 0, NA, ifelse(delta == 1, 1, 0))))
 #
 #   indat2$binY <- rbinom(500, 1, indat$trueP)
 #   indat2$binY[which(indat2$binY == 1)[1:100]]  <- NA
+  indat3 <- subset(indat2, time == 26.5)
 
-  slearn.binfit <- superlearner_binaryestimate(subset(indat2, !is.na(binY)), Y = "binY", X = paste0("X", 1:20))
+  cwefit <- survfit(Surv(Tout, delta == 0) ~ 1, data = indat3)
+  wts <- summary(cwefit, times = 26.5)$surv
+  indat3$censW <- 1 / wts
+
+  slearn.binfit <- superlearner_binaryestimate(subset(indat3, !is.na(binY)), Y = "binY", X = paste0("X", 1:20))
 
   bin.predres <-  predict(slearn.binfit, validat[, paste0("X", 1:20)], type = "response")$pred[, 1]
 

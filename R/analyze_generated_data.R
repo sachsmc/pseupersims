@@ -37,8 +37,8 @@ superlearner_estimate <- function(data, Y = "cause1.pseudo", X = paste0("X", 1:2
 
   }
 
-  sl.full <- SuperLearner(Y = YY, X = XX, SL.library = SL.library,
-                          verbose = FALSE, method = "method.pseudoAUC", control = list(pseu2 = Pseu2))
+  sl.full <- SuperLearner(Y = YY, X = XX, SL.library = SL.library, id = data$id,
+                          verbose = FALSE, method = "method.pseudoAUC", control = list(pseu2 = Pseu2, timedex = data$time == 26.5))
 
 
   sl.full
@@ -66,7 +66,7 @@ superlearner_binaryestimate <- function(data, Y = "binY", X = paste0("X", 1:20))
                    "SL.rpart", "SL.glmnet","SL.polymars", learners$names)
 
 
-  sl.full <- SuperLearner(Y = YY, X = XX, SL.library = SL.library, family = binomial(),
+  sl.full <- SuperLearner(Y = YY, X = XX, SL.library = SL.library, family = binomial(), obsWeights = data$censW, id = data$id,
                           verbose = FALSE, method = "method.NNloglik")
 
 

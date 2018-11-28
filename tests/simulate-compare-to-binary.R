@@ -5,7 +5,7 @@ cl <- makeCluster(getOption("cl.cores", 8))
 
 clusterEvalQ(cl, devtools::load_all())
 
-ree.scen <- function(scen, mp, ptb =TRUE) {
+ree.scen <- function(scen, mp, ptb =FALSE) {
 
 res.X <- clusterApplyLB(cl, 1:200, function(x){
   noret <- run_one_replicate(scenario = scen, missing.p = mp, output = sprintf("data/missing%.2f/simres%s-%03d.rds", mp, scen, x))
@@ -20,11 +20,13 @@ ree.scen("0", .2, ptb = FALSE)
 ree.scen("A", .2)
 ree.scen("B", .2)
 ree.scen("C", .2)
+ree.scen("D", .2)
 
 ree.scen("0", .5, ptb = FALSE)
 ree.scen("A", .5)
 ree.scen("B", .5)
 ree.scen("C", .5)
+ree.scen("D", .5)
 
 tabres <- function(res) {
 

@@ -72,7 +72,7 @@ run_one_replicate <- function(seed, scenario = "A", missing.p = .2,  output = "r
   ## binder model
 
   binder.fit <- CoxBoost(indat$Tout, indat$delta, as.matrix(indat[, paste0("X", 1:20)]))
-  binder.est <- predict(binder.fit, newdata = validat, type = "risk", times = 26.5)[, 1]
+  binder.est <- predict(binder.fit, newdata = as.matrix(validat[,  paste0("X", 1:20)]), type = "CIF", times = 26.5)[, 1]
 
   validat$predres.binder <- binder.est
 

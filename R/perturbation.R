@@ -10,7 +10,7 @@
 #'
 #' @return A data frame with the local slopes for each variable (columns) and each subject (rows)
 #'
-#' @export
+#' deprecated
 #'
 
 shift_pred  <- function(SLobject, X, predictor) {

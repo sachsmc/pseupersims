@@ -7,6 +7,13 @@ standardize <- function(x) {
 }
 
 
+#' Compute the time-varying cause-specific ROC curve using pseudo-observations
+#'
+#' @param X Vector of predictions
+#' @param pseu Pseudo observations at a fixed time for the cause of interest
+#' @param pseu2 Pseudo observations for the other cause
+#'
+#' @export
 
 calc_roc <-
   function(X, pseu, pseu2) {
@@ -73,6 +80,12 @@ calc_pAUC <- function(predictions, labels, pseu2) {
 }
 
 
+#' Optimize the time varying AUC
+#'
+#' @param Z Matrix of predictions
+#' @param Y Pseudo values for the cumulative incidence for the competing event of interest at a fixed time
+#' @param pseu2 Matrix of pseudo values for the cumulative incidences for all other competing events
+
 optimize_auc <-
   function(Z, Y, pseu2) {
     ## Z is a matrix of predictions, Y are pseudo-observations
@@ -111,6 +124,12 @@ my.SuperLearner.control <- function(saveFitLibrary = TRUE, trimLogit = 0.001, ..
 
 assignInNamespace("SuperLearner.control", my.SuperLearner.control, "SuperLearner")
 
+#' Pseudo AUC SuperLearner method
+#'
+#' To be passed to the SuperLearner function
+#'
+#' @export
+
 method.pseudoAUC <- function() {
   out <- list(
     # require allows you to pass a character vector with required packages
@@ -127,12 +146,12 @@ method.pseudoAUC <- function() {
                            control,
                            verbose,
                            ...) {
-      cvRisk <- apply(Z, 2, function(x) {
-        rocin <- calc_roc(x, Y, control$pseu2)
+      cvRisk <- apply(Z[control$timedex, ], 2, function(x) {
+        rocin <- calc_roc(x, Y[control$timedex], control$pseu2[control$timedex])
         1 - (calc_auc(rocin$fpf, rocin$tpf))
       })
 
-      coef <- tryCatch(optimize_auc(Z, Y, control$pseu2), error = function(e) rep(NA, ncol(Z)),
+      coef <- tryCatch(optimize_auc(Z[control$timedex, ], Y[control$timedex], control$pseu2[control$timedex]), error = function(e) rep(NA, ncol(Z)),
                        warning = function(e) rep(NA, ncol(Z)))
       out <- list(cvRisk = cvRisk,
                   coef = coef,
@@ -151,3 +170,13 @@ method.pseudoAUC <- function() {
 
 
 
+logit <- function(x) log(x / (1 - x))
+
+retrans <- function(po, theta) {
+  nn <- length(po)
+
+  theta.i <- (theta * nn - po) / (nn - 1)
+
+  nn * logit(theta) - (nn - 1) * logit(theta.i)
+
+}

@@ -15,6 +15,8 @@ shift_pred(SLobject, X, predictor)
 }
 \value{
 A data frame with the local slopes for each variable (columns) and each subject (rows)
+
+deprecated
 }
 \description{
 Given a fitted model object with a predict method, run a perturbation algorithm

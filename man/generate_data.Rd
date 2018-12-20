@@ -12,7 +12,8 @@ generate_data(n = 500, scenario = "A", missing.p = 0.2)
 \item{scenario}{Character designating the simulation scenario: 0 = NULL, no association, A = simple, one variable
 is linearly associated with IRIS,
 B = simple multivariate, 5 variables are linearly associated,
-C = wonky, interactions, nonlinearities, etc.}
+C = wonky, interactions, nonlinearities, etc.
+D = same as B but censoring depends on covariates}
 
 \item{missing.p}{Proportion of missing binary Y values (random censoring)}
 }

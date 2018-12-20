@@ -17,6 +17,8 @@ superlearner_estimate <- function(data, Y = "cause1.pseudo", X = paste0("X", 1:2
   XX <- data[, X]
   YY <- data[[Y]] #log((data[[Y]] - y0) / (y1 - data[[Y]]))
 
+
+
   Pseu2 <- data[[Y2]]
 
   tune = list(ntrees = c(200),
@@ -45,6 +47,15 @@ superlearner_estimate <- function(data, Y = "cause1.pseudo", X = paste0("X", 1:2
 
 }
 
+#' Run the superlearner model with binary indicator as the outcome
+#'
+#' @param data A data frame with pseudo observations and a set of predictors
+#' @param Y character string for the outcome variable in data
+#' @param X character vector for the predictor variables in data
+#'
+#' @return A fitted model object
+#'
+#' @export
 
 superlearner_binaryestimate <- function(data, Y = "binY", X = paste0("X", 1:20)) {
 
@@ -75,7 +86,7 @@ superlearner_binaryestimate <- function(data, Y = "binY", X = paste0("X", 1:20))
 }
 
 
-
+#' For testing purposes
 
 stupidlearner_estimate <- function(data, Y = "cause1.pseudo", X = paste0("X", 1:20), y0, y1) {
 

@@ -8,7 +8,7 @@
 #' @param missing.p proportion missing the binary outcome
 #' @param output path to output file
 #'
-#' @export
+#' deprecated
 
 run_one_perturb <- function(seed, scenario = "A", missing.p = .2,  output = "repouput.rds") {
 

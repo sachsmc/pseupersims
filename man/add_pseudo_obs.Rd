@@ -4,12 +4,12 @@
 \alias{add_pseudo_obs}
 \title{Add pseudo observations to a data frame}
 \usage{
-add_pseudo_obs(data)
+add_pseudo_obs(data, tme = c(17.5, 20, 26.5, 35))
 }
 \arguments{
 \item{data}{A data frame with censored survival times for 2 outcomes}
 
-\item{weights}{Vector of probability weights}
+\item{tme}{Vector of times at which to compute pseudo values}
 }
 \value{
 The data frame with pseudo observations added for t = 26.5 weeks

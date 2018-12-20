@@ -31,13 +31,15 @@ generate_data <- function(n = 500, scenario = "A", missing.p = .2) {
 
   } else if(scenario == "A") {
 
-    g1 <- exp(-2 + 5 * X[, 1])
+    g1 <- exp(-2 + 2.5 * X[, 1])
 
   } else if(scenario == "B") {
 
-    beta.b <- c(1.75, 1.5, 2.01, -3.02, -2.03) / 3
+    beta.b <- c(.75, .5, 6.1, 1.02, -2.03, 1, 2, 1, .6, .1, 3)
 
-    g1 <- sqrt(exp( X[, c(1, 6, 11, 16, 20)] %*% beta.b + X[, 2] * X[, 3]))
+    x.in <- cbind(X[, c(1, 6)], X[, 1] * X[, 6], bs(X[, 6], df = 4, degree = 3), bs(X[, 1], df = 4, degree = 3))
+
+    g1 <- sqrt(exp(6 + x.in %*% beta.b ))#+ cos(X[, 4] / .1) * X[, 3]) + X[, 4]^3 * X[, 1])
 
 
   } else if(scenario == "C") {
@@ -54,19 +56,40 @@ generate_data <- function(n = 500, scenario = "A", missing.p = .2) {
 
   } else if(scenario == "D") { # model in which censoring depends on a covariate
 
-    beta.b <- c(1.75, 1.5, 2.01, -3.02, -2.03) / 3
+    X2 <- X[, c(1, 6, 11, 16, 20)]
+    X2 <- cbind(X2, X2[, 1] * X2[, 2],
+                cos(X2[, 3] / .1),
+                X2[, 4] * ifelse(X2[, 4] < median(X2[, 4]), 0, 1))
 
-    g1 <- sqrt(exp( X[, c(1, 6, 11, 16, 20)] %*% beta.b + X[, 2] * X[, 3]))
+
+    beta.c <- c(1.1, 1.4, -2.1, -1.2, -2.3, -1.5, 6.7, .5) / 4
+
+    g1 <- sqrt(exp(X2 %*% beta.c))
+
+    beta.b <- beta.c[1:5] * 4
+
     censb1 <- sqrt(exp( X[, c(1, 6, 11, 16, 20)] %*% beta.b / 3))
     cskl <- (26.5 / ((-log(1 - .14)) ^ (1)))
     censb1 <- censb1 * mean(cskl / censb1)
 
+  } else if(scenario == "E") { # sampling from real data example
+
+    crohnraw <- readRDS("data/crohnraw.rds")
+    colnames(crohnraw)[4:23] <- paste0("X", 1:20)
+
+    outrows <- sample(1:nrow(crohnraw), n, replace =TRUE)
+
+    return(crohnraw[outrows, ])
+
   }
 
-  k2 <- 2.5
-  g2 <- 3.5
-  k1 <- exp(1.5 * X[, 1])
+  if(scenario != "E") {
 
+    k2 <- 2.5
+    g2 <- 3.5
+    k1 <- exp(2.5 * X[, 2])
+
+  }
   # ensure that g1 satisfies pweibull(26.5) ~= .20
   # ensure that k1 satisfies pweibull(26.5) ~= .07
 
@@ -98,6 +121,8 @@ generate_data <- function(n = 500, scenario = "A", missing.p = .2) {
     delta[randcens] <- 0
     Tout[randcens] <- runif(length(randcens), 0, 26.5)
   }
+
+  #return(mean(delta[Tout < 26.5] == 0))
 
   trueP <- sapply(1:n, function(i) {
   integrate(f = function(x){
@@ -135,14 +160,18 @@ generate_data <- function(n = 500, scenario = "A", missing.p = .2) {
 #'
 #' @export
 
-add_pseudo_obs <- function(data, tme = c(10, 15, 26.5, 50, 75)) {
+
+
+add_pseudo_obs <- function(data, tme = c(17.5, 20, 26.5, 35)) {
 
 
   psuo <- pseudoci(data$Tout, event = data$delta, tmax = tme)
 
-
   data <- do.call(rbind, lapply(1:length(tme), function(x) cbind(data, cause1.pseudo = psuo$pseudo$cause1[, x],
                                                          cause2.pseudo = psuo$pseudo$cause2[, x], time = tme[x])))
 
+  data
 
 }
+
+

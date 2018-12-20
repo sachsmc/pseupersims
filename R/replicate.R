@@ -5,8 +5,8 @@
 #' and returns the output in a sensible manner.
 #'
 #' @param seed random seed (integer)
-#' @param scenario data generation scenario, 0, A, B, or C
-#' @param missing.p proportion missing the binary outcome
+#' @param scenario data generation scenario, 0, A, B, C, D, or E
+#' @param missing.p proportion censoring overall
 #' @param output path to output file
 #'
 #' @export
@@ -20,11 +20,14 @@ run_one_replicate <- function(seed, scenario = "A", missing.p = .2,  output = "r
 
   indat2 <- add_pseudo_obs(indat)
 
-  slearn.fit <- superlearner_estimate(indat2, Y = "cause1.pseudo", X = c("time", paste0("X", 1:20)), Y2 = "cause2.pseudo")
+  slearn.fit <- superlearner_estimate(indat2, Y = "cause1.pseudo",
+                                      X = c("time", paste0("X", 1:20)), Y2 = "cause2.pseudo")
 
   slearn.fit.single <- superlearner_estimate(subset(indat2, time == "26.5"),
                                              Y = "cause1.pseudo", X = paste0("X", 1:20), Y2 = "cause2.pseudo")
   #slearn.fit <- stupidlearner_estimate(indat2, Y = "cause1.pseudo", X = paste0("X", 1:20), y0, y1)
+
+  #validat$xglearn <- custom.xgb(indat2[,  c("time", paste0("X", 1:20))], indat2$cause1.pseudo, validat)
 
   preder <- predict(slearn.fit, validat[, c("time", paste0("X", 1:20))])
 
@@ -60,7 +63,8 @@ run_one_replicate <- function(seed, scenario = "A", missing.p = .2,  output = "r
   indat3 <- subset(indat2, time == 26.5)
 
   cwefit <- survfit(Surv(Tout, delta == 0) ~ 1, data = indat3)
-  wts <- summary(cwefit, times = 26.5)$surv
+
+  wts <- sapply(indat3$Tout, function(x) summary(cwefit, times = min(26.5, x))$surv)
   indat3$censW <- 1 / wts
 
   slearn.binfit <- superlearner_binaryestimate(subset(indat3, !is.na(binY)), Y = "binY", X = paste0("X", 1:20))
@@ -78,19 +82,31 @@ run_one_replicate <- function(seed, scenario = "A", missing.p = .2,  output = "r
 
   # survival random forests
 
+  # validat$trueY <- 1.0 * validat$trueT
+  # validat$predres.rfsrc <- rnorm(nrow(validat))
+  # indat <- validat
+  #
+  # with(indat, c(performance(prediction(predres.pseudo, trueY), "auc")@y.values[[1]],
+  #               performance(prediction(predres.pseudo.single, trueY), "auc")@y.values[[1]],
+  #               performance(prediction(predres.binary, trueY), "auc")@y.values[[1]],
+  #               performance(prediction(predres.binder, trueY), "auc")@y.values[[1]],
+  #               performance(prediction(predres.rfsrc, trueY), "auc")@y.values[[1]],
+  #               performance(prediction(trueP, trueY), "auc")@y.values[[1]]))
+
+
   ishwarn.fit <- rfsrc(Surv(Tout, delta) ~ ., data = indat[, c("Tout", "delta", paste0("X", 1:20))])
   ishwarn.est <- predict(ishwarn.fit, newdata = validat)
 
   validat$predres.rfsrc <- ishwarn.est$cif[, max(which(ishwarn.est$time.interest <= 26.5)), 1]
 
-  # pstest <- with(validat, calc_roc(predres.pseudo, trueT, cause2.pseudo))
+  # pstest <- with(validat, calc_roc(predres.pseudo, cause1.pseudo, cause2.pseudo))
   # plot(tpf ~ fpf, data = pstest, col = "blue", type = "l")
-  # bitest <- with(validat, calc_roc(predres.binary, trueT, cause2.pseudo))
+  # bitest <- with(validat, calc_roc(predres.binary, cause1.pseudo, cause2.pseudo))
   # lines(tpf ~ fpf, data = bitest)
   # trtest <- with(validat, calc_roc(trueP, trueT, cause2.pseudo))
   # lines(tpf ~ fpf, data = trtest, col = "red")
-  # coxtst <- with(validat, calc_roc(predres.cox, trueT, cause2.pseudo))
-  # lines(tpf ~ fpf, data = coxtst, col = "green")
+  # binder <- with(validat, calc_roc(predres.binder, cause1.pseudo, cause2.pseudo))
+  # lines(tpf ~ fpf, data = binder, col = "green")
 
   saveRDS(validat, file = output)
 

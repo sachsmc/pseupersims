@@ -8,15 +8,16 @@
 #' @param scenario data generation scenario, 0, A, B, C, D, or E
 #' @param missing.p proportion censoring overall
 #' @param output path to output file
+#' @param n sample size
 #'
 #' @export
 
-run_one_replicate <- function(seed, scenario = "A", missing.p = .2,  output = "repouput.rds") {
+run_one_replicate <- function(seed, scenario = "A", missing.p = .2,  output = "repouput.rds", n = 500) {
 
   if(!missing(seed)) set.seed(seed)
 
-  indat <- generate_data(n = 500, scenario = scenario, missing.p = missing.p)
-  validat <- subset(add_pseudo_obs(generate_data(scenario = scenario, missing.p = missing.p)), time == 26.5)
+  indat <- generate_data(n = n, scenario = scenario, missing.p = missing.p)
+  validat <- subset(add_pseudo_obs(generate_data(n = n, scenario = scenario, missing.p = missing.p)), time == 26.5)
 
   indat2 <- add_pseudo_obs(indat)
 

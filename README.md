@@ -1,6 +1,5 @@
 # Ensemble Prediction of Time to Event Outcomes with Competing Risks: Code for simulation study
 
-
 This repository contains the code necessary to run and summarize the simulation study in the forthcoming paper: "Ensemble Prediction of Time to Event Outcomes with Competing Risks: A Case Study of Surgical Complications in Crohn's Disease".
 
 It is organized as an R package. The functions are defined in the files contained in the R subdirectory. In the tests subdirectory, you will find the file `simulate-compare-to-binary.R` which runs the simulation. You will find that Scenario E does not work, because I am not allowed to distribute that data.

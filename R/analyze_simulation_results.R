@@ -1,3 +1,9 @@
+mytimeROC <- function(time, delta, marker) {
+
+  timeROC(time, delta, marker, cause = 1, times = 26.5, ROC = FALSE)$AUC_1[2]
+
+}
+
 #' Analyze simulation results
 #'
 #' @export
@@ -16,10 +22,14 @@ analyze_sim <- function(scenario, folder, n = 200) {
 
   }))
   resem$binY <- with(resem, ifelse(Tout > 26.5, 0, ifelse(delta == 0, NA, ifelse(delta == 1, 1, 0))))
-  resem$trueY <- 1.0 * resem$trueT
+  #resem$trueY <- with(resem, ifelse(Y > 26.5 & Y2 > 26.5, 0, 1))
+  resem$deltatrue <- with(resem, ifelse(Y < Y2, 1, 2))
+  resem$trueY <- with(resem, pmin(Y, Y2))
+
   if(scenario == "E"){
-	resem$trueY <- rbinom(nrow(resem), 1, .4)
+	resem$trueY <- rnorm(nrow(resem))
 	resem$trueP <- rnorm(nrow(resem))
+	resem$deltatrue <- resem$delta
 	}
   ### calculate roc using binary, roc using time dependent, and mse comparing to true probability
 
@@ -27,13 +37,18 @@ analyze_sim <- function(scenario, folder, n = 200) {
   for(j in 1:n) {
 
     indat <- subset(resem, replicate == j)
+
     if(nrow(indat) == 0) next
-    true.auc <- with(indat, c(performance(prediction(predres.pseudo, trueY), "auc")@y.values[[1]],
-                              performance(prediction(predres.pseudo.single, trueY), "auc")@y.values[[1]],
-                              performance(prediction(predres.binary, trueY), "auc")@y.values[[1]],
-                              performance(prediction(predres.binder, trueY), "auc")@y.values[[1]],
-                              performance(prediction(predres.rfsrc, trueY), "auc")@y.values[[1]],
-                              performance(prediction(trueP, trueY), "auc")@y.values[[1]]))
+    true.auc <-
+      with(indat,
+           c(
+             mytimeROC(trueY, deltatrue, predres.pseudo),
+             mytimeROC(trueY, deltatrue, predres.pseudo.single),
+             mytimeROC(trueY, deltatrue, predres.binary),
+             mytimeROC(trueY, deltatrue, predres.binder),
+             mytimeROC(trueY, deltatrue, predres.rfsrc),
+             mytimeROC(trueY, deltatrue, trueP)
+           ))
 
 
     pauc.pseudo <- with(indat, calc_pAUC(predres.pseudo, cause1.pseudo, cause2.pseudo))

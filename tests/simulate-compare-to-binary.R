@@ -32,12 +32,11 @@ ree.scen("E", .5)
 
 tabres <- function(res) {
 
-  res %>% group_by(model) %>% summarize(mean.tbauc = mean(true.auc), sd.tbauc = sd(true.auc),
-                                        mean.pauc = mean(pauc), sd.pauc = sd(pauc),
+  res %>% group_by(model) %>% summarize(trueAUC = sprintf("%.3f (%.3f)", mean(true.auc), sd(true.auc)),
+                                        pseudoAUC = sprintf("%.3f (%.3f)", mean(pauc), sd(pauc)),
                                   #      mean.int = mean(cal.int), sd.int = sd(cal.int),
                                   #      mean.slp = mean(cal.slp, na.rm = TRUE), sd.slp = sd(cal.slp, na.rm = TRUE),
-                                        mean.bias = mean(bias), sd.prob = mean(sd),
-                                        mse = 100 * mean(bias^2)
+                                        bias = sprintf("%.3f (%.3f)", mean(bias), mean(sd))
                                         )
 
 }
